@@ -1,8 +1,7 @@
-from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import User
+from django.http import JsonResponse
+from api.models import Profile
 from api import tokendata
-from api.models import Profile, TrackToUser
-from rest_framework_jwt.utils import jwt_payload_handler
 import json
 
 
@@ -69,66 +68,4 @@ def UserToken(request):
 
     return JsonResponse({'result':'failed', 'error':'WrongMethod'}, safe=False)
 
-
-
-def UserProfileData(request, username):
-    if request.method == 'GET':
-        payload = tokendata.from_cookie_token_data(request)
-        if payload is None:
-            return JsonResponse({'result':'failed','error':'TokenVerificationFailed'}, safe=False)
-
-        try:
-            profile = Profile.objects.get(username=username)
-        except:
-            return JsonResponse({'result':'failed', 'error':'ProfileDoesNotExist', 'user':payload}, safe=False)
-
-        data = {
-            'username':profile.username,
-            'name':profile.name,
-            'surname':profile.surname,
-            'description':profile.description
-        }
-
-        return JsonResponse({'result':'success', 'user':payload, 'data':data}, safe=False)
-
-    return JsonResponse({'result':'failed', 'error':'WrongMethod'}, safe=False)
-
-
-
-def UserTracksData(request, username):
-    if request.method == 'GET':
-
-        payload = tokendata.from_cookie_token_data(request)
-        if payload is None:
-            return JsonResponse({'result':'failed','error':'TokenVerificationFailed'}, safe=False)
-        
-        try:
-            user = User.objects.get(username=username)
-        except:
-            return JsonResponse({'result':'failed','error':'UserNotExist'}, safe=False)
-        
-        tracks = user.tracks.all()
-        data = {
-            'tracks':[]
-        }
-        for track_to_user in tracks:
-            data['tracks'].append({
-                "id":track_to_user.track.id,
-                "author":track_to_user.track.author.username,
-                "name":track_to_user.track.name,
-                "length":track_to_user.track.length,
-            })
-        return JsonResponse({'result':'success', 'user':payload, 'data':data}, safe=False)
-    
-    return JsonResponse({'result':'failed', 'error':'WrongMethod'}, safe=False)
-
-
-
-
-    
-
-    
-
-
-        
         
