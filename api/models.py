@@ -61,4 +61,4 @@ class TrackToUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tracks')
 
     def __str__(self) -> str:
-        return f'{self.track.id} -> {self.user.username}'
+        return f'{self.user.username} -> {self.track.name} [ID:{self.track.id}]'

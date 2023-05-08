@@ -60,7 +60,7 @@ def UserLogin(request):
 
 
 
-def TokenUser(request):
+def UserToken(request):
     if request.method == 'GET':    
         payload = tokendata.from_cookie_token_data(request)
         if payload is None:
@@ -71,7 +71,7 @@ def TokenUser(request):
 
 
 
-def ProfileData(request, username):
+def UserProfileData(request, username):
     if request.method == 'GET':
         payload = tokendata.from_cookie_token_data(request)
         if payload is None:
@@ -83,7 +83,7 @@ def ProfileData(request, username):
             return JsonResponse({'result':'failed', 'error':'ProfileDoesNotExist', 'user':payload}, safe=False)
 
         data = {
-            'user':profile.username,
+            'username':profile.username,
             'name':profile.name,
             'surname':profile.surname,
             'description':profile.description
@@ -92,12 +92,30 @@ def ProfileData(request, username):
         return JsonResponse({'result':'success', 'user':payload, 'data':data}, safe=False)
 
 
-# def TracksData(request, username):
-#     if request.method == 'GET':
-#         user = User.objects.get(username=username)
-#         print(user)
-#         print(user.tracks.values())
-#         return HttpResponse(200)
+def UserTracksData(request, username):
+    if request.method == 'GET':
+
+        payload = tokendata.from_cookie_token_data(request)
+        if payload is None:
+            return JsonResponse({'result':'failed','error':'TokenVerificationFailed'}, safe=False)
+        
+        try:
+            user = User.objects.get(username=username)
+        except:
+            return JsonResponse({'result':'failed','error':'UserNotExist'}, safe=False)
+        
+        tracks = user.tracks.all()
+        data = {
+            'tracks':[]
+        }
+        for track_to_user in tracks:
+            data['tracks'].append({
+                "id":track_to_user.track.id,
+                "author":track_to_user.track.author.username,
+                "name":track_to_user.track.name,
+                "length":track_to_user.track.length,
+            })
+        return JsonResponse({'result':'success', 'user':payload, 'data':data}, safe=False)
 
 
 
