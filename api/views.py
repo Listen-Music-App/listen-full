@@ -91,6 +91,9 @@ def UserProfileData(request, username):
 
         return JsonResponse({'result':'success', 'user':payload, 'data':data}, safe=False)
 
+    return JsonResponse({'result':'failed', 'error':'WrongMethod'}, safe=False)
+
+
 
 def UserTracksData(request, username):
     if request.method == 'GET':
@@ -116,6 +119,8 @@ def UserTracksData(request, username):
                 "length":track_to_user.track.length,
             })
         return JsonResponse({'result':'success', 'user':payload, 'data':data}, safe=False)
+    
+    return JsonResponse({'result':'failed', 'error':'WrongMethod'}, safe=False)
 
 
 
