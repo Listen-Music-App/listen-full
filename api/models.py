@@ -52,7 +52,7 @@ class TrackToPlaylist(models.Model):
     playlist = models.ForeignKey(Playlist, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
-        return f'{self.track.name} -> {self.playlist.name}'
+        return f'{self.playlist.name} -> {self.track.name}'
 
 
 
@@ -62,3 +62,11 @@ class TrackToUser(models.Model):
 
     def __str__(self) -> str:
         return f'{self.user.username} -> {self.track.name} [ID:{self.track.id}]'
+    
+
+class PlaylistToUser(models.Model):
+    playlist = models.ForeignKey(Playlist, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='playlists')
+
+    def __str__(self) -> str:
+        return f'{self.user.username} -> {self.playlist.name} [ID:{self.playlist.id}]'
