@@ -1,5 +1,5 @@
 from django.urls import path
-from api.views import auth, userdata
+from api.views import auth, userdata, data
 
 urlpatterns = [
     path('register/', auth.UserRegister, name='UserRegister'),
@@ -8,4 +8,6 @@ urlpatterns = [
     path('<str:username>/profile/', userdata.UserProfileData, name='UserProfileData'),
     path('<str:username>/tracks/', userdata.UserTracksData, name='UserTracksData'),
     path('<str:username>/playlists/', userdata.UserPlaylistsData, name='UserPlaylistsData'),
+    path('playlists/', data.AllPlaylistsData, name='AllPlaylistsData'),
+    path('playlists/<int:playlist_id>/', data.PlaylistData, name='PlaylistData'),
 ]

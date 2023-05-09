@@ -5,11 +5,11 @@ from api import tokendata
 
 
 def UserProfileData(request, username):
+    payload = tokendata.from_cookie_token_data(request)
+    if payload is None:
+        return JsonResponse({'result':'failed','error':'TokenVerificationFailed'}, safe=False)
+        
     if request.method == 'GET':
-        payload = tokendata.from_cookie_token_data(request)
-        if payload is None:
-            return JsonResponse({'result':'failed','error':'TokenVerificationFailed'}, safe=False)
-
         try:
             profile = Profile.objects.get(username=username)
         except:
@@ -29,12 +29,11 @@ def UserProfileData(request, username):
 
 
 def UserTracksData(request, username):
+    payload = tokendata.from_cookie_token_data(request)
+    if payload is None:
+        return JsonResponse({'result':'failed','error':'TokenVerificationFailed'}, safe=False)
+    
     if request.method == 'GET':
-
-        payload = tokendata.from_cookie_token_data(request)
-        if payload is None:
-            return JsonResponse({'result':'failed','error':'TokenVerificationFailed'}, safe=False)
-        
         try:
             user = User.objects.get(username=username)
         except:
@@ -57,12 +56,11 @@ def UserTracksData(request, username):
 
 
 def UserPlaylistsData(request, username):
+    payload = tokendata.from_cookie_token_data(request)
+    if payload is None:
+        return JsonResponse({'result':'failed','error':'TokenVerificationFailed'}, safe=False)
+    
     if request.method == 'GET':
-
-        payload = tokendata.from_cookie_token_data(request)
-        if payload is None:
-            return JsonResponse({'result':'failed','error':'TokenVerificationFailed'}, safe=False)
-        
         try:
             user = User.objects.get(username=username)
         except:

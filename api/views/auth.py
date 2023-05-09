@@ -60,10 +60,11 @@ def UserLogin(request):
 
 
 def UserToken(request):
+    payload = tokendata.from_cookie_token_data(request)
+    if payload is None:
+        return JsonResponse({'result':'failed','error':'TokenVerificationFailed'}, safe=False)
+    
     if request.method == 'GET':    
-        payload = tokendata.from_cookie_token_data(request)
-        if payload is None:
-            return JsonResponse({'result':'failed','error':'TokenVerificationFailed'}, safe=False)
         return JsonResponse({'result':'success', 'user':payload}, safe=False)
 
     return JsonResponse({'result':'failed', 'error':'WrongMethod'}, safe=False)
