@@ -130,6 +130,8 @@ def TrackData(request, track_id):
         if track.author.username != user.username:
             return JsonResponse({'result':'failed','error':'UserIsntAuthor'}, safe=False)
         
+        track.delete()
+
         path = f'{BASE_DIR}\\audio_files\\{track_id}.mp3'
         if os.path.isfile(path):
             os.remove(path)
