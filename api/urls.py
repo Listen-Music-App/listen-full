@@ -11,5 +11,5 @@ urlpatterns = [
     path('playlists/', playlistsdata.AllPlaylistsData, name='AllPlaylistsData'),
     path('playlists/<int:playlist_id>/', playlistsdata.PlaylistData, name='PlaylistData'),
     path('tracks/', tracksdata.AllTracksData, name='AllTracksData'),
-    # path('tracks/<int:track_id>', tracksdata.TrackData, name='AllTracksData'),
+    path('tracks/<int:track_id>/', tracksdata.TrackData, name='AllTracksData'),
 ]
