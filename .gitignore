@@ -120,6 +120,12 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
+# Audio files
+*.mp3
+*.wav
+*.m4a
+*.mp4
+
 # Environments
 .env
 .venv

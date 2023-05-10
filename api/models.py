@@ -39,7 +39,7 @@ class Track(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=60)
     tags = models.CharField(max_length=200, blank=True, null=True)
-    length = models.IntegerField()
+    length = models.IntegerField(null=True)
     album = models.ForeignKey(Album, blank=True, null=True, on_delete=models.CASCADE, related_name='tracks')
 
     def __str__(self) -> str:
