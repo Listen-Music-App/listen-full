@@ -49,10 +49,13 @@ class Track(models.Model):
 
 class TrackToPlaylist(models.Model):
     track = models.ForeignKey(Track, on_delete=models.CASCADE)
-    playlist = models.ForeignKey(Playlist, on_delete=models.CASCADE)
+    playlist = models.ForeignKey(Playlist, on_delete=models.CASCADE, related_name='tracks')
 
     def __str__(self) -> str:
         return f'{self.playlist.name} -> {self.track.name}'
+    
+    class Meta:
+        unique_together = ("track", "playlist")
 
 
 
