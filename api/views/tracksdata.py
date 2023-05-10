@@ -1,7 +1,7 @@
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from api.models import Track, TrackToUser, TrackToPlaylist
+from api.models import Track, TrackToUser
 from api import tokendata
 import json
 import os
