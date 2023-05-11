@@ -1,6 +1,7 @@
+import json
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from api.models import Profile
+from api.models import Playlist, PlaylistToUser, Profile, Track, TrackToUser
 from api import tokendata
 
 
@@ -33,11 +34,14 @@ def UserTracksData(request, username):
     if payload is None:
         return JsonResponse({'result':'failed','error':'TokenVerificationFailed'}, safe=False)
     
+    try:
+        user = User.objects.get(username=username)
+    except:
+        return JsonResponse({'result':'failed','error':'UserNotExist'}, safe=False)
+    
+
+    # Get user's tracks
     if request.method == 'GET':
-        try:
-            user = User.objects.get(username=username)
-        except:
-            return JsonResponse({'result':'failed','error':'UserNotExist'}, safe=False)
         
         tracks = user.tracks.all()
         data = {
@@ -52,7 +56,56 @@ def UserTracksData(request, username):
             })
         return JsonResponse({'result':'success', 'user':payload, 'data':data}, safe=False)
     
+
+    # Append track to user
+    if request.method == "POST":
+        request_data = json.loads(request.body)
+        try:
+            request_data = json.loads(request.body)
+            track_id = request_data['track_id']
+        except:
+            return JsonResponse({'result':'failed','error':'WrongBodyRepresentation'}, safe=False)
+        
+        try:
+            track = Track.objects.get(id=track_id)
+        except:
+            return JsonResponse({'result':'failed','error':'TrackNotExist'}, safe=False)
+        
+        try:
+            relation = TrackToUser()
+            relation.track = track
+            relation.user = user
+            relation.save()
+        except:
+            return JsonResponse({'result':'failed','error':'TrackAlreadyInList'}, safe=False)
+        
+        return JsonResponse({'result':'success'}, safe=False)
+    
+
+    # Delete track from user
+    if request.method == "DELETE":
+        request_data = json.loads(request.body)
+        try:
+            request_data = json.loads(request.body)
+            track_id = request_data['track_id']
+        except:
+            return JsonResponse({'result':'failed','error':'WrongBodyRepresentation'}, safe=False)
+
+        try:
+            track = Track.objects.get(id=track_id)
+        except:
+            return JsonResponse({'result':'failed','error':'TrackNotExist'}, safe=False)
+        
+        try:
+            relation = TrackToUser.objects.get(track=track, user=user)
+        except:
+            return JsonResponse({'result':'failed','error':'TrackToUserNotExist'}, safe=False)
+        
+        relation.delete()
+        return JsonResponse({'result':'success'}, safe=False)
+    
     return JsonResponse({'result':'failed', 'error':'WrongMethod'}, safe=False)
+
 
 
 def UserPlaylistsData(request, username):
@@ -60,12 +113,14 @@ def UserPlaylistsData(request, username):
     if payload is None:
         return JsonResponse({'result':'failed','error':'TokenVerificationFailed'}, safe=False)
     
+    try:
+        user = User.objects.get(username=username)
+    except:
+        return JsonResponse({'result':'failed','error':'UserNotExist'}, safe=False)
+    
+
+    # Get user's playlists
     if request.method == 'GET':
-        try:
-            user = User.objects.get(username=username)
-        except:
-            return JsonResponse({'result':'failed','error':'UserNotExist'}, safe=False)
-        
         playlists = user.playlists.all()
         data = {
             'playlists':[]
@@ -77,5 +132,51 @@ def UserPlaylistsData(request, username):
                 "name":playlist_to_user.playlist.name,
             })
         return JsonResponse({'result':'success', 'user':payload, 'data':data}, safe=False)
+
+    
+    # Append playlist to user
+    if request.method == 'POST':
+        try:
+            request_data = json.loads(request.body)
+            playlist_id = request_data['playlist_id']
+        except:
+            return JsonResponse({'result':'failed','error':'WrongBodyRepresentation'}, safe=False)
+
+        try:
+            playlist = Playlist.objects.get(id=playlist_id)
+        except:
+            return JsonResponse({'result':'failed','error':'PlaylistNotExist'}, safe=False)
+        
+        try:
+            relation = PlaylistToUser()
+            relation.playlist = playlist
+            relation.user = user
+            relation.save()
+        except:
+            return JsonResponse({'result':'failed','error':'PlaylistAlreadyInList'}, safe=False)
+        
+        return JsonResponse({'result':'success'}, safe=False)
+    
+
+    # Delete Playlist from User
+    if request.method == 'DELETE':
+        try:
+            request_data = json.loads(request.body)
+            playlist_id = request_data['playlist_id']
+        except:
+            return JsonResponse({'result':'failed','error':'WrongBodyRepresentation'}, safe=False)
+
+        try:
+            playlist = Playlist.objects.get(id=playlist_id)
+        except:
+            return JsonResponse({'result':'failed','error':'PlaylistNotExist'}, safe=False)
+        
+        try:
+            relation = PlaylistToUser.objects.get(playlist=playlist, user=user)
+        except:
+            return JsonResponse({'result':'failed','error':'PlaylistToUserNotExist'}, safe=False)
+        
+        relation.delete()
+        return JsonResponse({'result':'success'}, safe=False)
     
     return JsonResponse({'result':'failed', 'error':'WrongMethod'}, safe=False)

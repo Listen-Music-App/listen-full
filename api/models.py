@@ -66,6 +66,9 @@ class TrackToUser(models.Model):
     def __str__(self) -> str:
         return f'{self.user.username} -> {self.track.name} [ID:{self.track.id}]'
     
+    class Meta:
+        unique_together = ("track", "user")
+    
 
 class PlaylistToUser(models.Model):
     playlist = models.ForeignKey(Playlist, on_delete=models.CASCADE)
@@ -73,3 +76,6 @@ class PlaylistToUser(models.Model):
 
     def __str__(self) -> str:
         return f'{self.user.username} -> {self.playlist.name} [ID:{self.playlist.id}]'
+
+    class Meta:
+        unique_together = ("playlist", "user")

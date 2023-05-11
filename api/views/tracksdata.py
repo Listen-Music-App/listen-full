@@ -44,12 +44,13 @@ def AllTracksData(request):
 
         try:
             file = request.FILES['Audio']
-            file_format = file.name.split('.')[-1]
-            if file_format not in ['mp3']:
-                return JsonResponse({'result':'failed','error':'WrongFileFormat'}, safe=False)
         except:
             return JsonResponse({'result':'failed','error':'WrongFileRepresentation'}, safe=False)
         
+        file_format = file.name.split('.')[-1]
+        if file_format not in ['mp3']:
+            return JsonResponse({'result':'failed','error':'WrongFileFormat'}, safe=False)
+
         try:
             request_data = json.loads(request.POST['Data'])
             track_name = request_data['name']
