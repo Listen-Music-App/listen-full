@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from api.models import Profile
+from api.views.results import Error, Success
 from api import tokendata
 import json
 
@@ -11,10 +12,10 @@ def UserRegister(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         if User.objects.filter(username=data['username']):
-            return JsonResponse({'result':'failed', 'error':'UsernameUsed'}, safe=False)
+            return Error.UsernameUsed()
 
         if User.objects.filter(email=data['email']):
-            return JsonResponse({'result':'failed', 'error':'EmailUsed'}, safe=False)
+            return Error.EmailUsed()
              
         user = User()
         user.username = data['username']
@@ -27,9 +28,9 @@ def UserRegister(request):
         profile.username = data['username']
         profile.save()
         
-        return JsonResponse({'result':'success'}, safe=False)
+        return Success.SimpleSuccess()
 
-    return JsonResponse({'result':'failed', 'error':'WrongMethod'}, safe=False)
+    return Error.WrongMethod()
 
 
 
@@ -42,10 +43,10 @@ def UserLogin(request):
         try:
             user = User.objects.get(username=username)
         except:
-            return JsonResponse({'result':'failed','error':'WrongUsername'}, safe=False)
+            return Error.WrongUsername()
         
         if not user.check_password(password):
-            return JsonResponse({'result':'failed','error':'WrongPassword'}, safe=False)
+            return Error.WrongPassword()
         
         print(f'YOUR USER IS: {user}')
 
@@ -55,18 +56,18 @@ def UserLogin(request):
         response.set_cookie(key='JWT', value=token, max_age=3600, httponly=True)
         return response
 
-    return JsonResponse({'result':'failed', 'error':'WrongMethod'}, safe=False)
+    return Error.WrongMethod()
 
 
 
 def UserToken(request):
     payload = tokendata.from_cookie_token_data(request)
     if payload is None:
-        return JsonResponse({'result':'failed','error':'TokenVerificationFailed'}, safe=False)
+        return Error.TokenVerificationError()
     
     if request.method == 'GET':    
-        return JsonResponse({'result':'success', 'user':payload}, safe=False)
+        return Success.SimpleSuccess()
 
-    return JsonResponse({'result':'failed', 'error':'WrongMethod'}, safe=False)
+    return Error.WrongMethod()
 
         

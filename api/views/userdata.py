@@ -3,18 +3,19 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 from api.models import Playlist, PlaylistToUser, Profile, Track, TrackToUser
 from api import tokendata
+from api.views.results import Error, Success
 
 
 def UserProfileData(request, username):
     payload = tokendata.from_cookie_token_data(request)
     if payload is None:
-        return JsonResponse({'result':'failed','error':'TokenVerificationFailed'}, safe=False)
+        return Error.TokenVerificationError()
         
     if request.method == 'GET':
         try:
             profile = Profile.objects.get(username=username)
         except:
-            return JsonResponse({'result':'failed', 'error':'ProfileDoesNotExist', 'user':payload}, safe=False)
+            return Error.ProfileNotExist()
 
         data = {
             'username':profile.username,
@@ -23,21 +24,21 @@ def UserProfileData(request, username):
             'description':profile.description
         }
 
-        return JsonResponse({'result':'success', 'user':payload, 'data':data}, safe=False)
+        return Success.DataSuccess(data)
 
-    return JsonResponse({'result':'failed', 'error':'WrongMethod'}, safe=False)
+    return Error.WrongMethod()
 
 
 
 def UserTracksData(request, username):
     payload = tokendata.from_cookie_token_data(request)
     if payload is None:
-        return JsonResponse({'result':'failed','error':'TokenVerificationFailed'}, safe=False)
+        return Error.TokenVerificationError()
     
     try:
         user = User.objects.get(username=username)
     except:
-        return JsonResponse({'result':'failed','error':'UserNotExist'}, safe=False)
+        return Error.UserNotExist()
     
 
     # Get user's tracks
@@ -54,7 +55,7 @@ def UserTracksData(request, username):
                 "name":track_to_user.track.name,
                 "length":track_to_user.track.length,
             })
-        return JsonResponse({'result':'success', 'user':payload, 'data':data}, safe=False)
+        return Success.DataSuccess()
     
 
     # Append track to user
@@ -64,12 +65,12 @@ def UserTracksData(request, username):
             request_data = json.loads(request.body)
             track_id = request_data['track_id']
         except:
-            return JsonResponse({'result':'failed','error':'WrongBodyRepresentation'}, safe=False)
+            return Error.WrongBodyRepresentation()
         
         try:
             track = Track.objects.get(id=track_id)
         except:
-            return JsonResponse({'result':'failed','error':'TrackNotExist'}, safe=False)
+            return Error.TrackNotExist()
         
         try:
             relation = TrackToUser()
@@ -77,9 +78,9 @@ def UserTracksData(request, username):
             relation.user = user
             relation.save()
         except:
-            return JsonResponse({'result':'failed','error':'TrackAlreadyInList'}, safe=False)
+            return Error.AlreadyInList()
         
-        return JsonResponse({'result':'success'}, safe=False)
+        return Success.SimpleSuccess()
     
 
     # Delete track from user
@@ -89,34 +90,34 @@ def UserTracksData(request, username):
             request_data = json.loads(request.body)
             track_id = request_data['track_id']
         except:
-            return JsonResponse({'result':'failed','error':'WrongBodyRepresentation'}, safe=False)
+            return Error.WrongBodyRepresentation()
 
         try:
             track = Track.objects.get(id=track_id)
         except:
-            return JsonResponse({'result':'failed','error':'TrackNotExist'}, safe=False)
+            return Error.TrackNotExist()
         
         try:
             relation = TrackToUser.objects.get(track=track, user=user)
         except:
-            return JsonResponse({'result':'failed','error':'TrackToUserNotExist'}, safe=False)
+            return Error.RelationNotExist()
         
         relation.delete()
-        return JsonResponse({'result':'success'}, safe=False)
+        return Success.SimpleSuccess()
     
-    return JsonResponse({'result':'failed', 'error':'WrongMethod'}, safe=False)
+    return Error.WrongMethod()
 
 
 
 def UserPlaylistsData(request, username):
     payload = tokendata.from_cookie_token_data(request)
     if payload is None:
-        return JsonResponse({'result':'failed','error':'TokenVerificationFailed'}, safe=False)
+        return Error.TokenVerificationError()
     
     try:
         user = User.objects.get(username=username)
     except:
-        return JsonResponse({'result':'failed','error':'UserNotExist'}, safe=False)
+        return Error.UserNotExist()
     
 
     # Get user's playlists
@@ -131,7 +132,7 @@ def UserPlaylistsData(request, username):
                 "author":playlist_to_user.playlist.author.username,
                 "name":playlist_to_user.playlist.name,
             })
-        return JsonResponse({'result':'success', 'user':payload, 'data':data}, safe=False)
+        return Success.DataSuccess(data)
 
     
     # Append playlist to user
@@ -140,12 +141,12 @@ def UserPlaylistsData(request, username):
             request_data = json.loads(request.body)
             playlist_id = request_data['playlist_id']
         except:
-            return JsonResponse({'result':'failed','error':'WrongBodyRepresentation'}, safe=False)
+            return Error.WrongBodyRepresentation()
 
         try:
             playlist = Playlist.objects.get(id=playlist_id)
         except:
-            return JsonResponse({'result':'failed','error':'PlaylistNotExist'}, safe=False)
+            return Error.PlaylistNotExist()
         
         try:
             relation = PlaylistToUser()
@@ -153,9 +154,9 @@ def UserPlaylistsData(request, username):
             relation.user = user
             relation.save()
         except:
-            return JsonResponse({'result':'failed','error':'PlaylistAlreadyInList'}, safe=False)
+            return Error.AlreadyInList()
         
-        return JsonResponse({'result':'success'}, safe=False)
+        return Success.SimpleSuccess()
     
 
     # Delete Playlist from User
@@ -164,19 +165,19 @@ def UserPlaylistsData(request, username):
             request_data = json.loads(request.body)
             playlist_id = request_data['playlist_id']
         except:
-            return JsonResponse({'result':'failed','error':'WrongBodyRepresentation'}, safe=False)
+            return Error.WrongBodyRepresentation()
 
         try:
             playlist = Playlist.objects.get(id=playlist_id)
         except:
-            return JsonResponse({'result':'failed','error':'PlaylistNotExist'}, safe=False)
+            return Error.PlaylistNotExist()
         
         try:
             relation = PlaylistToUser.objects.get(playlist=playlist, user=user)
         except:
-            return JsonResponse({'result':'failed','error':'PlaylistToUserNotExist'}, safe=False)
+            return Error.RelationNotExist()
         
         relation.delete()
-        return JsonResponse({'result':'success'}, safe=False)
+        return Success.SimpleSuccess()
     
-    return JsonResponse({'result':'failed', 'error':'WrongMethod'}, safe=False)
+    return Error.WrongMethod()
