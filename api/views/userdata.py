@@ -15,7 +15,7 @@ def UserProfileData(request, username):
         try:
             profile = Profile.objects.get(username=username)
         except:
-            return Error.ProfileNotExist()
+            return Error.ProfileNotExist(user_payload=payload)
 
         data = {
             'username':profile.username,
@@ -24,9 +24,9 @@ def UserProfileData(request, username):
             'description':profile.description
         }
 
-        return Success.DataSuccess(data)
+        return Success.DataSuccess(data, user_payload=payload)
 
-    return Error.WrongMethod()
+    return Error.WrongMethod(user_payload=payload)
 
 
 
@@ -38,7 +38,7 @@ def UserTracksData(request, username):
     try:
         user = User.objects.get(username=username)
     except:
-        return Error.UserNotExist()
+        return Error.UserNotExist(user_payload=payload)
     
 
     # Get user's tracks
@@ -55,7 +55,7 @@ def UserTracksData(request, username):
                 "name":track_to_user.track.name,
                 "length":track_to_user.track.length,
             })
-        return Success.DataSuccess()
+        return Success.DataSuccess(data, user_payload=payload)
     
 
     # Append track to user
@@ -65,12 +65,12 @@ def UserTracksData(request, username):
             request_data = json.loads(request.body)
             track_id = request_data['track_id']
         except:
-            return Error.WrongBodyRepresentation()
+            return Error.WrongBodyRepresentation(user_payload=payload)
         
         try:
             track = Track.objects.get(id=track_id)
         except:
-            return Error.TrackNotExist()
+            return Error.TrackNotExist(user_payload=payload)
         
         try:
             relation = TrackToUser()
@@ -78,9 +78,9 @@ def UserTracksData(request, username):
             relation.user = user
             relation.save()
         except:
-            return Error.AlreadyInList()
+            return Error.AlreadyInList(user_payload=payload)
         
-        return Success.SimpleSuccess()
+        return Success.SimpleSuccess(user_payload=payload)
     
 
     # Delete track from user
@@ -90,22 +90,22 @@ def UserTracksData(request, username):
             request_data = json.loads(request.body)
             track_id = request_data['track_id']
         except:
-            return Error.WrongBodyRepresentation()
+            return Error.WrongBodyRepresentation(user_payload=payload)
 
         try:
             track = Track.objects.get(id=track_id)
         except:
-            return Error.TrackNotExist()
+            return Error.TrackNotExist(user_payload=payload)
         
         try:
             relation = TrackToUser.objects.get(track=track, user=user)
         except:
-            return Error.RelationNotExist()
+            return Error.RelationNotExist(user_payload=payload)
         
         relation.delete()
-        return Success.SimpleSuccess()
+        return Success.SimpleSuccess(user_payload=payload)
     
-    return Error.WrongMethod()
+    return Error.WrongMethod(user_payload=payload)
 
 
 
@@ -117,7 +117,7 @@ def UserPlaylistsData(request, username):
     try:
         user = User.objects.get(username=username)
     except:
-        return Error.UserNotExist()
+        return Error.UserNotExist(user_payload=payload)
     
 
     # Get user's playlists
@@ -132,7 +132,7 @@ def UserPlaylistsData(request, username):
                 "author":playlist_to_user.playlist.author.username,
                 "name":playlist_to_user.playlist.name,
             })
-        return Success.DataSuccess(data)
+        return Success.DataSuccess(data, user_payload=payload)
 
     
     # Append playlist to user
@@ -141,12 +141,12 @@ def UserPlaylistsData(request, username):
             request_data = json.loads(request.body)
             playlist_id = request_data['playlist_id']
         except:
-            return Error.WrongBodyRepresentation()
+            return Error.WrongBodyRepresentation(user_payload=payload)
 
         try:
             playlist = Playlist.objects.get(id=playlist_id)
         except:
-            return Error.PlaylistNotExist()
+            return Error.PlaylistNotExist(user_payload=payload)
         
         try:
             relation = PlaylistToUser()
@@ -154,9 +154,9 @@ def UserPlaylistsData(request, username):
             relation.user = user
             relation.save()
         except:
-            return Error.AlreadyInList()
+            return Error.AlreadyInList(user_payload=payload)
         
-        return Success.SimpleSuccess()
+        return Success.SimpleSuccess(user_payload=payload)
     
 
     # Delete Playlist from User
@@ -165,19 +165,19 @@ def UserPlaylistsData(request, username):
             request_data = json.loads(request.body)
             playlist_id = request_data['playlist_id']
         except:
-            return Error.WrongBodyRepresentation()
+            return Error.WrongBodyRepresentation(user_payload=payload)
 
         try:
             playlist = Playlist.objects.get(id=playlist_id)
         except:
-            return Error.PlaylistNotExist()
+            return Error.PlaylistNotExist(user_payload=payload)
         
         try:
             relation = PlaylistToUser.objects.get(playlist=playlist, user=user)
         except:
-            return Error.RelationNotExist()
+            return Error.RelationNotExist(user_payload=payload)
         
         relation.delete()
-        return Success.SimpleSuccess()
+        return Success.SimpleSuccess(user_payload=payload)
     
-    return Error.WrongMethod()
+    return Error.WrongMethod(user_payload=payload)

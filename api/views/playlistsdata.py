@@ -8,14 +8,14 @@ import json
 
 
 def AllPlaylistsData(request):
-    token_payload = tokendata.from_cookie_token_data(request)
-    if token_payload is None:
+    payload = tokendata.from_cookie_token_data(request)
+    if payload is None:
         return Error.TokenVerificationError()
     
     try:
-        author = User.objects.get(username=token_payload['username'])
+        author = User.objects.get(username=payload['username'])
     except:
-        return Error.UserNotExist()
+        return Error.UserNotExist(user_payload=payload)
     
 
     # Get all Playlists
@@ -29,7 +29,7 @@ def AllPlaylistsData(request):
                 'name':playlist.name,
                 'description':playlist.description
             })
-        return Success.DataSuccess(data)
+        return Success.DataSuccess(data, user_payload=payload)
 
 
     # Create Playlist
@@ -39,7 +39,7 @@ def AllPlaylistsData(request):
             playlist_name = request_data['name']
             playlist_description = request_data['description']
         except:
-            return Error.WrongBodyRepresentation()
+            return Error.WrongBodyRepresentation(user_payload=payload)
 
         playlist = Playlist()
         playlist.author = author
@@ -52,26 +52,26 @@ def AllPlaylistsData(request):
         relation.user = author
         relation.playlist = playlist
         relation.save()
-        return Success.SimpleSuccess()
+        return Success.SimpleSuccess(user_payload=payload)
     
-    return Error.WrongMethod()
+    return Error.WrongMethod(user_payload=payload)
 
 
 
 def PlaylistData(request, playlist_id):
-    token_payload = tokendata.from_cookie_token_data(request)
-    if token_payload is None:
+    payload = tokendata.from_cookie_token_data(request)
+    if payload is None:
         return Error.TokenVerificationError()
     
     try:
-        user = User.objects.get(username=token_payload['username'])
+        user = User.objects.get(username=payload['username'])
     except:
-        return Error.UserNotExist()
+        return Error.UserNotExist(user_payload=payload)
     
     try:
         playlist = Playlist.objects.get(id=playlist_id)
     except:
-        return Error.PlaylistNotExist()
+        return Error.PlaylistNotExist(user_payload=payload)
 
 
     # Get Playlist Data
@@ -82,68 +82,68 @@ def PlaylistData(request, playlist_id):
             "name":playlist.name,
             "description":playlist.description,
         }
-        return Success.DataSuccess(data)
+        return Success.DataSuccess(data, user_payload=payload)
     
 
     # Update Playlist Data
     if request.method == 'PUT':
         if playlist.author.username != user.username:
-            return Error.UserIsntAuthor()
+            return Error.UserIsntAuthor(user_payload=payload)
         
         try:
             new_data = json.loads(request.body)
             playlist.name = new_data["name"]
             playlist.description = new_data["description"]
         except:
-            return Error.WrongBodyRepresentation()
+            return Error.WrongBodyRepresentation(user_payload=payload)
         
         playlist.save()
-        return Success.SimpleSuccess()
+        return Success.SimpleSuccess(user_payload=payload)
     
     # Delete Playlist Data
     if request.method == 'DELETE':
         if playlist.author.username != user.username:
-            return Error.UserIsntAuthor()
+            return Error.UserIsntAuthor(user_payload=payload)
         
         playlist.delete()
-        return Success.SimpleSuccess()
+        return Success.SimpleSuccess(user_payload=payload)
 
-    return Error.WrongMethod()
+    return Error.WrongMethod(user_payload=payload)
 
 
 
 def TrackToPlaylistData(request, playlist_id):
-    token_payload = tokendata.from_cookie_token_data(request)
-    if token_payload is None:
-        return Error.TokenVerificationError
+    payload = tokendata.from_cookie_token_data(request)
+    if payload is None:
+        return Error.TokenVerificationError()
     
     try:
-        user = User.objects.get(username=token_payload['username'])
+        user = User.objects.get(username=payload['username'])
     except:
-        return Error.UserNotExist()
+        return Error.UserNotExist(user_payload=payload)
     
     try:
         playlist = Playlist.objects.get(id=playlist_id)
     except:
-        return Error.PlaylistNotExist()
+        return Error.PlaylistNotExist(user_payload=payload)
 
 
     # Append track to playlist
     if request.method == 'POST':
         if playlist.author.username != user.username:
-            return Error.UserIsntAuthor()
+            return Error.UserIsntAuthor(user_payload=payload)
         
         request_data = json.loads(request.body)
         try:
             request_data = json.loads(request.body)
             track_id = request_data['track_id']
         except:
-            return Error.WrongBodyRepresentation()
+            return Error.WrongBodyRepresentation(user_payload=payload)
         
         try:
             track = Track.objects.get(id=track_id)
         except:
-            return Error.TrackNotExist()
+            return Error.TrackNotExist(user_payload=payload)
         
         try:
             relation = TrackToPlaylist()
@@ -151,10 +151,10 @@ def TrackToPlaylistData(request, playlist_id):
             relation.playlist = playlist
             relation.save()
         except:
-            return Error.AlreadyInList()
+            return Error.AlreadyInList(user_payload=payload)
         
 
-        return Success.SimpleSuccess()
+        return Success.SimpleSuccess(user_payload=payload)
     
 
     # Get tracks of playlist
@@ -170,32 +170,32 @@ def TrackToPlaylistData(request, playlist_id):
                 'length':track.length,
                 'album':track.album
             })
-        return Success.DataSuccess(data)
+        return Success.DataSuccess(data, user_payload=payload)
     
 
     # Delete track from playlist
     if request.method == 'DELETE':
         if playlist.author.username != user.username:
-            return Error.UserIsntAuthor()
+            return Error.UserIsntAuthor(user_payload=payload)
         
         request_data = json.loads(request.body)
         try:
             request_data = json.loads(request.body)
             track_id = request_data['track_id']
         except:
-            return Error.WrongBodyRepresentation()
+            return Error.WrongBodyRepresentation(user_payload=payload)
         
         try:
             track = Track.objects.get(id=track_id)
         except:
-            return Error.TrackNotExist()
+            return Error.TrackNotExist(user_payload=payload)
         
         try:
             relation = TrackToPlaylist.objects.get(track=track, playlist=playlist)
         except:
-            return Error.RelationNotExist()
+            return Error.RelationNotExist(user_payload=payload)
         
         relation.delete()
-        return Success.SimpleSuccess()
+        return Success.SimpleSuccess(user_payload=payload)
     
-    return Error.WrongMethod()
+    return Error.WrongMethod(user_payload=payload)

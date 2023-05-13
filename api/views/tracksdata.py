@@ -11,14 +11,14 @@ from server.settings import BASE_DIR
 
 
 def AllTracksData(request):
-    token_payload = tokendata.from_cookie_token_data(request)
-    if token_payload is None:
+    payload = tokendata.from_cookie_token_data(request)
+    if payload is None:
         return Error.TokenVerificationError()
     
     try:
-        author = User.objects.get(username=token_payload['username'])
+        author = User.objects.get(username=payload['username'])
     except:
-        return Error.UserNotExist()
+        return Error.UserNotExist(user_payload=payload)
     
 
     # Get all Tracks
@@ -34,7 +34,7 @@ def AllTracksData(request):
                 'length':track.length,
                 'album':track.album
             })
-        return Success.DataSuccess(data)
+        return Success.DataSuccess(data, user_payload=payload)
 
 
     # Create Track
@@ -45,11 +45,11 @@ def AllTracksData(request):
         try:
             file = request.FILES['Audio']
         except:
-            return Error.WrongFileRepresentation()
+            return Error.WrongFileRepresentation(user_payload=payload)
         
         file_format = file.name.split('.')[-1]
         if file_format not in ['mp3']:
-            return Error.WrongFileFormat()
+            return Error.WrongFileFormat(user_payload=payload)
 
         try:
             request_data = json.loads(request.POST['Data'])
@@ -58,7 +58,7 @@ def AllTracksData(request):
             track_length = request_data['length']
             track_album = request_data['album']
         except:
-            return Error.WrongBodyRepresentation()
+            return Error.WrongBodyRepresentation(user_payload=payload)
 
         track = Track()
         track.author = author
@@ -72,26 +72,26 @@ def AllTracksData(request):
         relation.user = author
         relation.track = track
         relation.save()
-        return Success.SimpleSuccess()
+        return Success.SimpleSuccess(user_payload=payload)
     
-    return Error.WrongMethod()
+    return Error.WrongMethod(user_payload=payload)
 
 
 
 def TrackData(request, track_id):
-    token_payload = tokendata.from_cookie_token_data(request)
-    if token_payload is None:
+    payload = tokendata.from_cookie_token_data(request)
+    if payload is None:
         return Error.TokenVerificationError()
     
     try:
         track = Track.objects.get(id=track_id)
     except:
-        return Error.TrackNotExist()
+        return Error.TrackNotExist(user_payload=payload)
     
     try:
-        user = User.objects.get(username=token_payload['username'])
+        user = User.objects.get(username=payload['username'])
     except:
-        return Error.UserNotExist()
+        return Error.UserNotExist(user_payload=payload)
 
 
     # Get Track Data
@@ -105,13 +105,13 @@ def TrackData(request, track_id):
             'album':track.album
         }
 
-        return Success.DataSuccess(data)
+        return Success.DataSuccess(data, user_payload=payload)
     
 
     # Update Track Data
     if request.method == 'PUT':
         if track.author.username != user.username:
-            return Error.UserIsntAuthor()
+            return Error.UserIsntAuthor(user_payload=payload)
         
         try:
             new_data = json.loads(request.body)
@@ -120,16 +120,16 @@ def TrackData(request, track_id):
             track.length = new_data["length"]
             track.album = new_data["album"]
         except:
-            return Error.WrongBodyRepresentation()
+            return Error.WrongBodyRepresentation(user_payload=payload)
         
         track.save()
-        return Success.SimpleSuccess()
+        return Success.SimpleSuccess(user_payload=payload)
     
     
     # Delete Track Data and Track Audio-File
     if request.method == 'DELETE':
         if track.author.username != user.username:
-            return Error.UserIsntAuthor()
+            return Error.UserIsntAuthor(user_payload=payload)
         
         track.delete()
 
@@ -137,7 +137,7 @@ def TrackData(request, track_id):
         if os.path.isfile(path):
             os.remove(path)
         
-        return Success.SimpleSuccess()
+        return Success.SimpleSuccess(user_payload=payload)
 
-    return Error.WrongMethod()
+    return Error.WrongMethod(user_payload=payload)
     

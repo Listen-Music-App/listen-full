@@ -5,6 +5,8 @@ from api.views.results import Error, Success
 from api import tokendata
 import json
 
+from server.settings import SECRET_KEY
+
 
 
 # Create your views here.
@@ -47,12 +49,13 @@ def UserLogin(request):
         
         if not user.check_password(password):
             return Error.WrongPassword()
-        
-        print(f'YOUR USER IS: {user}')
 
         token = tokendata.token_generate(user)
-        print(f'YOUR TOKEN IS: {token}')
-        response = JsonResponse({'result':'success'}, safe=False)
+        payload = tokendata.token_data(token=token, secret=SECRET_KEY)
+        if payload is None:
+            return Error.TokenVerificationError()
+        
+        response = JsonResponse({'result':'success', 'user_payload':payload}, safe=False)
         response.set_cookie(key='JWT', value=token, max_age=3600, httponly=True)
         return response
 
@@ -66,8 +69,8 @@ def UserToken(request):
         return Error.TokenVerificationError()
     
     if request.method == 'GET':    
-        return Success.SimpleSuccess()
+        return Success.SimpleSuccess(user_payload=payload)
 
-    return Error.WrongMethod()
+    return Error.WrongMethod(user_payload=payload)
 
         
