@@ -5,7 +5,7 @@ from api.views.results import Error, Success
 from api import tokendata
 import json
 
-from server.settings import SECRET_KEY
+from server.settings import SECRET_KEY, JWT_AUTH
 
 
 
@@ -56,7 +56,7 @@ def UserLogin(request):
             return Error.TokenVerificationError()
         
         response = JsonResponse({'result':'success', 'user_payload':payload}, safe=False)
-        response.set_cookie(key='JWT', value=token, max_age=3600, httponly=True)
+        response.set_cookie(key='JWT', value=token, expires=JWT_AUTH['JWT_EXPIRATION_DELTA'], httponly=True)
         return response
 
     return Error.WrongMethod()
