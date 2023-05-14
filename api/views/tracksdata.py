@@ -1,6 +1,6 @@
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.models import User
-from django.http import JsonResponse
+from django.http import FileResponse, HttpResponse
 from api.models import Track, TrackToUser
 from api.views.results import Error, Success
 from api import tokendata
@@ -141,3 +141,38 @@ def TrackData(request, track_id):
 
     return Error.WrongMethod(user_payload=payload)
     
+
+
+def TrackFile(request, track_id):
+    payload = tokendata.from_cookie_token_data(request)
+    if payload is None:
+        return Error.TokenVerificationError()
+
+    try:
+        track = Track.objects.get(id=track_id)
+    except:
+        return Error.TrackNotExist(user_payload=payload)
+    
+    try:
+        user = User.objects.get(username=payload['username'])
+    except:
+        return Error.UserNotExist(user_payload=payload)
+    
+
+    # Get track's audio file
+    if request.method == 'GET':
+        filename= f"audio_files/{track_id}.mp3"
+
+        try:
+            f = open(filename,"rb")
+        except:
+            return  Error.WrongFileRepresentation()
+
+        response = HttpResponse()
+        response['Content-Type'] ='audio/mp3'
+        response['Content-Length'] =os.path.getsize(filename)
+
+        response.write(f.read())
+        return response
+    
+    return Error.WrongMethod()
