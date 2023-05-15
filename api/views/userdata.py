@@ -43,8 +43,15 @@ def UserTracksData(request, username):
 
     # Get user's tracks
     if request.method == 'GET':
+        offset = request.GET.get('offset', None)
+        limit = int(request.GET.get('limit', 10))
+
+        if offset is not None:
+            offset = int(offset)
+            tracks = user.tracks.all()[offset:offset+limit]
+        else:
+            tracks = user.tracks.all()[:limit]
         
-        tracks = user.tracks.all()
         data = {
             'tracks':[]
         }
@@ -122,7 +129,15 @@ def UserPlaylistsData(request, username):
 
     # Get user's playlists
     if request.method == 'GET':
-        playlists = user.playlists.all()
+        offset = request.GET.get('offset', None)
+        limit = int(request.GET.get('limit', 10))
+
+        if offset is not None:
+            offset = int(offset)
+            playlists = user.playlists.all()[offset:offset+limit]
+        else:
+            playlists = user.playlists.all()[:limit]
+        
         data = {
             'playlists':[]
         }
