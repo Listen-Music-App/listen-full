@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-h2ks^!ij@(=5$6fa&7*z_w4ye_u3txd$8d^p5k^%9xw_&k%ba*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'api',
+    'tune_auth',
 ]
 
 MIDDLEWARE = [
@@ -78,11 +79,11 @@ WSGI_APPLICATION = 'server.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': '...',
-        'USER':'...',
-        'PASSWORD':'...',
-        'HOST':'...',
-        'PORT': '...',
+        'NAME': 'tunedb',
+        'USER':'<user>',
+        'PASSWORD':'<password>',
+        'HOST':'<host>',
+        'PORT': '<port>',
     }
 }
 

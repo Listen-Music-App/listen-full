@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.http import FileResponse, HttpResponse
 from api.models import Track, TrackToUser
 from api.views.results import Error, Success
-from api import tokendata
+from tune_auth import tokendata
 import json
 import os
 from server.settings import BASE_DIR

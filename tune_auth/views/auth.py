@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 from api.models import Profile
 from api.views.results import Error, Success
-from api import tokendata
+from tune_auth import tokendata
 import json
 
 from server.settings import SECRET_KEY, JWT_AUTH
@@ -13,6 +13,7 @@ from server.settings import SECRET_KEY, JWT_AUTH
 def UserRegister(request):
     if request.method == 'POST':
         data = json.loads(request.body)
+
         if User.objects.filter(username=data['username']):
             return Error.UsernameUsed()
 
