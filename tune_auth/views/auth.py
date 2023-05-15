@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from api.models import Profile
-from api.views.results import Error, Success
+from tune_api.models import Profile
+from tune_api.views.results import Error, Success
 from tune_auth import tokendata
 import json
 

@@ -1,9 +1,9 @@
 import json
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from api.models import Playlist, PlaylistToUser, Profile, Track, TrackToUser
+from tune_api.models import Playlist, PlaylistToUser, Profile, Track, TrackToUser
 from tune_auth import tokendata
-from api.views.results import Error, Success
+from tune_api.views.results import Error, Success
 
 
 def UserProfileData(request, username):

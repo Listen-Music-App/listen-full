@@ -1,8 +1,8 @@
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.models import User
 from django.http import FileResponse, HttpResponse
-from api.models import Track, TrackToUser
-from api.views.results import Error, Success
+from tune_api.models import Track, TrackToUser
+from tune_api.views.results import Error, Success
 from tune_auth import tokendata
 import json
 import os

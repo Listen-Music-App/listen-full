@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from api.models import Playlist, PlaylistToUser, Track, TrackToPlaylist
-from api.views.results import Error, Success
+from tune_api.models import Playlist, PlaylistToUser, Track, TrackToPlaylist
+from tune_api.views.results import Error, Success
 from tune_auth import tokendata
 import json
 
