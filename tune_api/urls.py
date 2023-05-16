@@ -15,5 +15,4 @@ urlpatterns = [
     path('tracks/<int:track_id>.mp3/', tracksdata.TrackFile, name='TrackFile'),
 
     path('images/users/<str:username>/', userdata.UserImage, name='UserImage'),
-    path('images/users/', userdata.UserImageUpload, name='UserImageUpload'),
 ]
