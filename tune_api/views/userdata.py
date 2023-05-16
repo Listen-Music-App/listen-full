@@ -1,7 +1,6 @@
 import json
 from django.contrib.auth.models import User
-from django.http import JsonResponse
-from tune_api.models import Playlist, PlaylistToUser, Profile, Track, TrackToUser
+from tune_api.models import Playlist, PlaylistToUser, Track, TrackToUser
 from tune_auth import tokendata
 from tune_api.views.results import Error, Success
 
@@ -13,15 +12,14 @@ def UserProfileData(request, username):
         
     if request.method == 'GET':
         try:
-            profile = Profile.objects.get(username=username)
+            user = User.objects.get(username=username)
         except:
-            return Error.ProfileNotExist(user_payload=payload)
+            return Error.UserNotExist(user_payload=payload)
 
         data = {
-            'username':profile.username,
-            'name':profile.name,
-            'surname':profile.surname,
-            'description':profile.description
+            'username':user.username,
+            'name':user.first_name,
+            'surname':user.last_name
         }
 
         return Success.DataSuccess(data, user_payload=payload)

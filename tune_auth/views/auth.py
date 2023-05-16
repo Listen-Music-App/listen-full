@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from tune_api.models import Profile
 from tune_api.views.results import Error, Success
 from tune_auth import tokendata
 import json
@@ -25,11 +24,6 @@ def UserRegister(request):
         user.email = data['email']
         user.set_password(data['password'])
         user.save()
-
-        profile = Profile()
-        profile.user = user
-        profile.username = data['username']
-        profile.save()
         
         return Success.SimpleSuccess()
 
