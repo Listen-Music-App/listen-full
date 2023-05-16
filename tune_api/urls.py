@@ -2,9 +2,9 @@ from django.urls import path
 from tune_api.views import userdata, playlistsdata, tracksdata
 
 urlpatterns = [
-    path('<str:username>/', userdata.UserData, name='UserData'),
-    path('<str:username>/tracks/', userdata.UserTracksData, name='UserTracksData'),
-    path('<str:username>/playlists/', userdata.UserPlaylistsData, name='UserPlaylistsData'),
+    path('user/<str:username>/', userdata.UserData, name='UserData'),
+    path('user/<str:username>/tracks/', userdata.UserTracksData, name='UserTracksData'),
+    path('user/<str:username>/playlists/', userdata.UserPlaylistsData, name='UserPlaylistsData'),
 
     path('playlists/', playlistsdata.AllPlaylistsData, name='AllPlaylistsData'),
     path('playlists/<int:playlist_id>/', playlistsdata.PlaylistData, name='PlaylistData'),
@@ -15,4 +15,5 @@ urlpatterns = [
     path('tracks/<int:track_id>.mp3/', tracksdata.TrackFile, name='TrackFile'),
 
     path('images/users/<str:username>/', userdata.UserImage, name='UserImage'),
+    path('images/playlists/<int:playlist_id>/', playlistsdata.PlaylistImage, name='PlaylistImage')
 ]
