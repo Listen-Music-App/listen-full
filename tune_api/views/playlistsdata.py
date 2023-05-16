@@ -1,5 +1,8 @@
+import glob
+import os
 from django.contrib.auth.models import User
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
+from django.core.files.storage import FileSystemStorage
 from tune_api.models import Playlist, PlaylistToUser, Track, TrackToPlaylist
 from tune_api.views.results import Error, Success
 from tune_auth import tokendata
@@ -33,7 +36,7 @@ def AllPlaylistsData(request):
 
 
     # Create Playlist
-    if request.method == 'POST':        
+    if request.method == "POST":        
         try:
             request_data = json.loads(request.body)
             playlist_name = request_data['name']
@@ -109,6 +112,70 @@ def PlaylistData(request, playlist_id):
         return Success.SimpleSuccess(user_payload=payload)
 
     return Error.WrongMethod(user_payload=payload)
+
+
+
+def PlaylistImage(request, playlist_id):
+    payload = tokendata.from_cookie_token_data(request)
+    if payload is None:
+        return Error.TokenVerificationError()
+    
+    try:
+        playlist = Playlist.objects.get(id=playlist_id)
+    except:
+        return Error.PlaylistNotExist(user_payload=payload)
+    
+    storage = 'images/playlists/'
+
+
+    # Get PlaylistImage
+    if request.method == 'GET':
+        filename = glob.glob(f"{storage}{playlist.id}.*")
+
+        if filename:
+            filename = filename[0]
+            f = open(filename, "rb")
+            format = filename.split('.')[-1]
+        else:
+            f = open(f"images/playlists/playlistdefaultimage.png", "rb")
+            format = 'png'
+
+        response = HttpResponse()
+        response['Content-Type'] = f'image/{format}'
+
+        response.write(f.read())
+        return response
+    
+
+    # Upload PlaylistImage
+    if request.method == 'POST':
+        fs = FileSystemStorage(location=storage)
+
+        try:
+            user = User.objects.get(username=payload['username'])
+            if playlist.author.username != user.username:
+                return Error.UserIsntAuthor(user_payload=payload)
+        except:
+            return Error.UserNotExist(user_payload=payload)
+        
+        try:
+            file = request.FILES['Image']
+        except:
+            return Error.WrongFileRepresentation(user_payload=payload)
+        
+        file_format = file.name.split('.')[-1]
+        if file_format not in ['jpeg', 'jpg', 'png']:
+            return Error.WrongFileFormat(user_payload=payload)
+        
+        previous_file = glob.glob(f'{storage}{playlist.id}.*')
+        if previous_file:
+            os.remove(previous_file[0])
+
+        file_name = fs.save(f'{playlist.id}.{file_format}', file)
+        file_url = fs.url(file_name)
+        return Success.SimpleSuccess(user_payload=payload)
+    
+    return Error.WrongMethod()
 
 
 
