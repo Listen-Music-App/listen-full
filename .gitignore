@@ -126,6 +126,12 @@ celerybeat.pid
 *.m4a
 *.mp4
 
+# Image file
+*.jpg
+*.jpeg
+*.png
+*.gif
+
 # Environments
 .env
 .venv
