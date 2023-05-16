@@ -1,15 +1,20 @@
+import glob
 import json
+import os
 from django.contrib.auth.models import User
+from django.core.files.storage import FileSystemStorage
+from django.http import HttpResponse
 from tune_api.models import Playlist, PlaylistToUser, Track, TrackToUser
 from tune_auth import tokendata
 from tune_api.views.results import Error, Success
 
 
-def UserProfileData(request, username):
+def UserData(request, username):
     payload = tokendata.from_cookie_token_data(request)
     if payload is None:
         return Error.TokenVerificationError()
         
+
     if request.method == 'GET':
         try:
             user = User.objects.get(username=username)
@@ -25,6 +30,72 @@ def UserProfileData(request, username):
         return Success.DataSuccess(data, user_payload=payload)
 
     return Error.WrongMethod(user_payload=payload)
+
+
+
+def UserImage(request, username):
+    payload = tokendata.from_cookie_token_data(request)
+    if payload is None:
+        return Error.TokenVerificationError()
+
+    if not User.objects.filter(username=username).exists():
+        return Error.UserNotExist(user_payload=payload)
+
+
+    # Get UserImage
+    if request.method == 'GET':
+        filename = glob.glob(f"images/users/{username}.*")
+
+        if filename:
+            filename = filename[0]
+            f = open(filename, "rb")
+            format = filename.split('.')[-1]
+        else:
+            f = open(f"images/users/userdefaultimage.jpg", "rb")
+            format = 'jpg'
+
+        response = HttpResponse()
+        response['Content-Type'] = f'image/{format}'
+
+        response.write(f.read())
+        return response
+
+    return Error.WrongMethod()
+
+
+
+def UserImageUpload(request):
+    payload = tokendata.from_cookie_token_data(request)
+    if payload is None:
+        return Error.TokenVerificationError()
+
+    if not User.objects.filter(username=payload['username']).exists():
+        return Error.UserNotExist(user_payload=payload)
+    
+    # Upload UserImage
+    if request.method == 'POST':
+        storage = 'images/users/'
+        fs = FileSystemStorage(location=storage)
+
+        try:
+            file = request.FILES['Image']
+        except:
+            return Error.WrongFileRepresentation(user_payload=payload)
+        
+        file_format = file.name.split('.')[-1]
+        if file_format not in ['jpeg', 'jpg', 'png', 'gif']:
+            return Error.WrongFileFormat(user_payload=payload)
+        
+        previous_file = glob.glob(f'{storage}{payload["username"]}.*')
+        if previous_file:
+            os.remove(previous_file[0])
+
+        file_name = fs.save(f'{payload["username"]}.{file_format}', file)
+        file_url = fs.url(file_name)
+        return Success.SimpleSuccess(user_payload=payload)
+
+
+    return Error.WrongMethod()
 
 
 
