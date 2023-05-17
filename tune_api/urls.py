@@ -12,7 +12,7 @@ urlpatterns = [
 
     path('tracks/', tracksdata.AllTracksData, name='AllTracksData'),
     path('tracks/<int:track_id>/', tracksdata.TrackData, name='TrackData'),
-    path('tracks/<int:track_id>.mp3/', tracksdata.TrackFile, name='TrackFile'),
+    path('tracks/<int:track_id>/file/', tracksdata.TrackFile, name='TrackFile'),
 
     path('images/users/<str:username>/', userdata.UserImage, name='UserImage'),
     path('images/playlists/<int:playlist_id>/', playlistsdata.PlaylistImage, name='PlaylistImage')

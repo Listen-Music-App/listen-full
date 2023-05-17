@@ -1,3 +1,4 @@
+import glob
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.models import User
 from django.http import FileResponse, HttpResponse
@@ -39,7 +40,7 @@ def AllTracksData(request):
 
     # Create Track
     if request.method == 'POST':
-        storage = 'audio_files/'
+        storage = 'audio/'
         fs = FileSystemStorage(location=storage)
 
         try:
@@ -48,7 +49,7 @@ def AllTracksData(request):
             return Error.WrongFileRepresentation(user_payload=payload)
         
         file_format = file.name.split('.')[-1]
-        if file_format not in ['mp3']:
+        if file_format not in ['mp3','m4a','wav']:
             return Error.WrongFileFormat(user_payload=payload)
 
         try:
@@ -133,9 +134,10 @@ def TrackData(request, track_id):
         
         track.delete()
 
-        path = f'{BASE_DIR}\\audio_files\\{track_id}.mp3'
-        if os.path.isfile(path):
-            os.remove(path)
+        filename = glob.glob(f'audio/{track_id}.*')
+        if filename:
+            filename = filename[0]
+            os.remove(filename)
         
         return Success.SimpleSuccess(user_payload=payload)
 
@@ -161,16 +163,18 @@ def TrackFile(request, track_id):
 
     # Get track's audio file
     if request.method == 'GET':
-        filename= f"audio_files/{track_id}.mp3"
+        filename = glob.glob(f"audio/{track_id}.*")
 
-        try:
+        if filename:
+            filename = filename[0]
             f = open(filename,"rb")
-        except:
+            format = filename.split('.')[-1]
+        else:
             return  Error.WrongFileRepresentation()
 
         response = HttpResponse()
-        response['Content-Type'] ='audio/mp3'
-        response['Content-Length'] =os.path.getsize(filename)
+        response['Content-Type'] = f'audio/{format}'
+        response['Content-Length'] = os.path.getsize(filename)
 
         response.write(f.read())
         return response
