@@ -1,44 +1,49 @@
 import glob
 import json
 import os
-from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse
+from tune_api.auth import authorize, userexists
 from tune_api.models import Playlist, PlaylistToUser, Track, TrackToUser
-from tune_auth import tokendata
 from tune_api.views.results import Error, Success
 
 
-def UserData(request, username):
-    payload = tokendata.from_cookie_token_data(request)
-    if payload is None:
-        return Error.TokenVerificationError()
+
+# def UserData(request, username):
+#     payload = authorize(request)
+#     if not payload:
+#         return Error.TokenVerificationError()
         
 
-    if request.method == 'GET':
-        try:
-            user = User.objects.get(username=username)
-        except:
-            return Error.UserNotExist(user_payload=payload)
+#     if request.method == 'GET':
+#         data = {
+#             'username':None,
+#             'first_name':None,
+#             'last_name':None,
+#             'desc':None
+#         }
+#         try:
+#             profile = Profile.objects.get(username=username)
+#         except:
+#             return Success.DataSuccess(data, user_payload=payload)
+        
+#         data['username'] = profile.username
+#         data['first_name'] = profile.first_name
+#         data['last_name'] = profile.last_name
+#         data['desc'] = profile.desc
+        
+#         return Success.DataSuccess(data, user_payload=payload)
 
-        data = {
-            'username':user.username,
-            'name':user.first_name,
-            'surname':user.last_name
-        }
-
-        return Success.DataSuccess(data, user_payload=payload)
-
-    return Error.WrongMethod(user_payload=payload)
+#     return Error.WrongMethod(user_payload=payload)
 
 
 
 def UserImage(request, username):
-    payload = tokendata.from_cookie_token_data(request)
-    if payload is None:
+    payload = authorize(request)
+    if not payload:
         return Error.TokenVerificationError()
 
-    if not User.objects.filter(username=username).exists():
+    if not userexists(username):
         return Error.UserNotExist(user_payload=payload)
 
     storage = 'images/users/'
@@ -89,15 +94,12 @@ def UserImage(request, username):
 
 
 def UserTracksData(request, username):
-    payload = tokendata.from_cookie_token_data(request)
-    if payload is None:
+    payload = authorize(request)
+    if not payload:
         return Error.TokenVerificationError()
     
-    try:
-        user = User.objects.get(username=username)
-    except:
+    if not userexists(username):
         return Error.UserNotExist(user_payload=payload)
-    
 
     # Get user's tracks
     if request.method == 'GET':
@@ -106,9 +108,9 @@ def UserTracksData(request, username):
 
         if offset is not None:
             offset = int(offset)
-            tracks = user.tracks.all()[offset:offset+limit]
+            tracks = TrackToUser.objects.filter(username=username).all()[offset:offset+limit]
         else:
-            tracks = user.tracks.all()[:limit]
+            tracks = TrackToUser.objects.filter(username=username).all()[:limit]
         
         data = {
             'tracks':[]
@@ -116,7 +118,7 @@ def UserTracksData(request, username):
         for track_to_user in tracks:
             data['tracks'].append({
                 "id":track_to_user.track.id,
-                "author":track_to_user.track.author.username,
+                "author":track_to_user.track.author,
                 "name":track_to_user.track.name,
                 "length":track_to_user.track.length,
             })
@@ -125,6 +127,9 @@ def UserTracksData(request, username):
 
     # Append track to user
     if request.method == "POST":
+        if username != payload['username']:
+            return Error.UserIsntAuthor(user_payload=payload)
+        
         request_data = json.loads(request.body)
         try:
             request_data = json.loads(request.body)
@@ -140,7 +145,7 @@ def UserTracksData(request, username):
         try:
             relation = TrackToUser()
             relation.track = track
-            relation.user = user
+            relation.username = username
             relation.save()
         except:
             return Error.AlreadyInList(user_payload=payload)
@@ -150,6 +155,9 @@ def UserTracksData(request, username):
 
     # Delete track from user
     if request.method == "DELETE":
+        if username != payload['username']:
+            return Error.UserIsntAuthor(user_payload=payload)
+        
         request_data = json.loads(request.body)
         try:
             request_data = json.loads(request.body)
@@ -163,7 +171,7 @@ def UserTracksData(request, username):
             return Error.TrackNotExist(user_payload=payload)
         
         try:
-            relation = TrackToUser.objects.get(track=track, user=user)
+            relation = TrackToUser.objects.get(track=track, username=username)
         except:
             return Error.RelationNotExist(user_payload=payload)
         
@@ -175,13 +183,11 @@ def UserTracksData(request, username):
 
 
 def UserPlaylistsData(request, username):
-    payload = tokendata.from_cookie_token_data(request)
-    if payload is None:
+    payload = authorize(request)
+    if not payload:
         return Error.TokenVerificationError()
     
-    try:
-        user = User.objects.get(username=username)
-    except:
+    if not userexists(username):
         return Error.UserNotExist(user_payload=payload)
     
 
@@ -192,9 +198,9 @@ def UserPlaylistsData(request, username):
 
         if offset is not None:
             offset = int(offset)
-            playlists = user.playlists.all()[offset:offset+limit]
+            playlists = PlaylistToUser.objects.filter(username=username).all()[offset:offset+limit]
         else:
-            playlists = user.playlists.all()[:limit]
+            playlists = PlaylistToUser.objects.filter(username=username).all()[:limit]
         
         data = {
             'playlists':[]
@@ -202,7 +208,7 @@ def UserPlaylistsData(request, username):
         for playlist_to_user in playlists:
             data['playlists'].append({
                 "id":playlist_to_user.playlist.id,
-                "author":playlist_to_user.playlist.author.username,
+                "author":playlist_to_user.playlist.author,
                 "name":playlist_to_user.playlist.name,
             })
         return Success.DataSuccess(data, user_payload=payload)
@@ -210,6 +216,9 @@ def UserPlaylistsData(request, username):
     
     # Append playlist to user
     if request.method == 'POST':
+        if username != payload['username']:
+            return Error.UserIsntAuthor(user_payload=payload)
+        
         try:
             request_data = json.loads(request.body)
             playlist_id = request_data['playlist_id']
@@ -224,7 +233,7 @@ def UserPlaylistsData(request, username):
         try:
             relation = PlaylistToUser()
             relation.playlist = playlist
-            relation.user = user
+            relation.username = username
             relation.save()
         except:
             return Error.AlreadyInList(user_payload=payload)
@@ -234,6 +243,9 @@ def UserPlaylistsData(request, username):
 
     # Delete Playlist from User
     if request.method == 'DELETE':
+        if username != payload['username']:
+            return Error.UserIsntAuthor(user_payload=payload)
+        
         try:
             request_data = json.loads(request.body)
             playlist_id = request_data['playlist_id']
@@ -246,7 +258,7 @@ def UserPlaylistsData(request, username):
             return Error.PlaylistNotExist(user_payload=payload)
         
         try:
-            relation = PlaylistToUser.objects.get(playlist=playlist, user=user)
+            relation = PlaylistToUser.objects.get(playlist=playlist, username=username)
         except:
             return Error.RelationNotExist(user_payload=payload)
         

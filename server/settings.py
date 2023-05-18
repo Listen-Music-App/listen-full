@@ -35,11 +35,9 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tune_api',
-    'tune_auth',
 ]
 
 MIDDLEWARE = [
@@ -80,10 +78,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'tunedb',
-        'USER':'<user>',
-        'PASSWORD':'<password>',
-        'HOST':'<host>',
-        'PORT': '<port>',
+        'USER':'owner',
+        'PASSWORD':'password',
+        'HOST':'192.168.1.6',
+        'PORT': '5432',
     }
 }
 
@@ -110,14 +108,6 @@ REST_FRAMEWORK = {
   'DEFAULT_AUTHENTICATION_CLASSES': (
     'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
   ),
-}
-
-JWT_AUTH = {
-    'JWT_VERIFY': True,
-    'JWT_VERIFY_EXPIRATION': True,
-    'JWT_EXPIRATION_DELTA': timedelta(days=2),
-    'JWT_ALLOW_REFRESH': False,
-    'JWT_AUTH_HEADER_PREFIX': 'Bearer',
 }
 
 # Internationalization

@@ -1,24 +1,20 @@
 import glob
 import os
-from django.contrib.auth.models import User
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from django.core.files.storage import FileSystemStorage
+from tune_api.auth import authorize
 from tune_api.models import Playlist, PlaylistToUser, Track, TrackToPlaylist
 from tune_api.views.results import Error, Success
-from tune_auth import tokendata
 import json
 
 
 
 def AllPlaylistsData(request):
-    payload = tokendata.from_cookie_token_data(request)
-    if payload is None:
+    payload = authorize(request)
+    if not payload:
         return Error.TokenVerificationError()
     
-    try:
-        author = User.objects.get(username=payload['username'])
-    except:
-        return Error.UserNotExist(user_payload=payload)
+    author = payload['username']
     
 
     # Get all Playlists
@@ -28,7 +24,7 @@ def AllPlaylistsData(request):
         for playlist in playlists_query:
             data['playlists'].append({
                 'id':playlist.id,
-                'author':playlist.author.username,
+                'author':playlist.author,
                 'name':playlist.name,
                 'description':playlist.description
             })
@@ -52,7 +48,7 @@ def AllPlaylistsData(request):
         playlist.save()
 
         relation = PlaylistToUser()
-        relation.user = author
+        relation.username = author
         relation.playlist = playlist
         relation.save()
         return Success.SimpleSuccess(user_payload=payload)
@@ -62,14 +58,10 @@ def AllPlaylistsData(request):
 
 
 def PlaylistData(request, playlist_id):
-    payload = tokendata.from_cookie_token_data(request)
-    if payload is None:
+    payload = authorize(request)
+    if not payload:
         return Error.TokenVerificationError()
-    
-    try:
-        user = User.objects.get(username=payload['username'])
-    except:
-        return Error.UserNotExist(user_payload=payload)
+
     
     try:
         playlist = Playlist.objects.get(id=playlist_id)
@@ -81,7 +73,7 @@ def PlaylistData(request, playlist_id):
     if request.method == 'GET':
         data = {
             "id":playlist.id,
-            "author":playlist.author.username,
+            "author":playlist.author,
             "name":playlist.name,
             "description":playlist.description,
         }
@@ -90,7 +82,7 @@ def PlaylistData(request, playlist_id):
 
     # Update Playlist Data
     if request.method == 'PUT':
-        if playlist.author.username != user.username:
+        if playlist.author != payload['username']:
             return Error.UserIsntAuthor(user_payload=payload)
         
         try:
@@ -105,7 +97,7 @@ def PlaylistData(request, playlist_id):
     
     # Delete Playlist Data
     if request.method == 'DELETE':
-        if playlist.author.username != user.username:
+        if playlist.author != payload['username']:
             return Error.UserIsntAuthor(user_payload=payload)
         
         playlist.delete()
@@ -116,8 +108,8 @@ def PlaylistData(request, playlist_id):
 
 
 def PlaylistImage(request, playlist_id):
-    payload = tokendata.from_cookie_token_data(request)
-    if payload is None:
+    payload = authorize(request)
+    if not payload:
         return Error.TokenVerificationError()
     
     try:
@@ -151,12 +143,8 @@ def PlaylistImage(request, playlist_id):
     if request.method == 'POST':
         fs = FileSystemStorage(location=storage)
 
-        try:
-            user = User.objects.get(username=payload['username'])
-            if playlist.author.username != user.username:
-                return Error.UserIsntAuthor(user_payload=payload)
-        except:
-            return Error.UserNotExist(user_payload=payload)
+        if playlist.author != payload['username']:
+            return Error.UserIsntAuthor(user_payload=payload)
         
         try:
             file = request.FILES['Image']
@@ -180,14 +168,9 @@ def PlaylistImage(request, playlist_id):
 
 
 def TrackToPlaylistData(request, playlist_id):
-    payload = tokendata.from_cookie_token_data(request)
-    if payload is None:
+    payload = authorize(request)
+    if not payload:
         return Error.TokenVerificationError()
-    
-    try:
-        user = User.objects.get(username=payload['username'])
-    except:
-        return Error.UserNotExist(user_payload=payload)
     
     try:
         playlist = Playlist.objects.get(id=playlist_id)
@@ -197,7 +180,7 @@ def TrackToPlaylistData(request, playlist_id):
 
     # Append track to playlist
     if request.method == 'POST':
-        if playlist.author.username != user.username:
+        if playlist.author != payload['username']:
             return Error.UserIsntAuthor(user_payload=payload)
         
         request_data = json.loads(request.body)
@@ -232,7 +215,7 @@ def TrackToPlaylistData(request, playlist_id):
             data['tracks'].append({
                 'id':track.id,
                 'name':track.name,
-                'author':track.author.username,
+                'author':track.author,
                 'tags':track.tags,
                 'length':track.length,
                 'album':track.album
@@ -242,7 +225,7 @@ def TrackToPlaylistData(request, playlist_id):
 
     # Delete track from playlist
     if request.method == 'DELETE':
-        if playlist.author.username != user.username:
+        if playlist.author != payload['username']:
             return Error.UserIsntAuthor(user_payload=payload)
         
         request_data = json.loads(request.body)

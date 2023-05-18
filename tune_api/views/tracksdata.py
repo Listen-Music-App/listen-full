@@ -1,25 +1,20 @@
 import glob
 from django.core.files.storage import FileSystemStorage
-from django.contrib.auth.models import User
-from django.http import FileResponse, HttpResponse
+from django.http import HttpResponse
+from tune_api.auth import authorize
 from tune_api.models import Track, TrackToUser
 from tune_api.views.results import Error, Success
-from tune_auth import tokendata
 import json
 import os
-from server.settings import BASE_DIR
 
 
 
 def AllTracksData(request):
-    payload = tokendata.from_cookie_token_data(request)
-    if payload is None:
+    payload = authorize(request)
+    if not payload:
         return Error.TokenVerificationError()
     
-    try:
-        author = User.objects.get(username=payload['username'])
-    except:
-        return Error.UserNotExist(user_payload=payload)
+    author = payload['username']
     
 
     # Get all Tracks
@@ -30,7 +25,7 @@ def AllTracksData(request):
             data['tracks'].append({
                 'id':track.id,
                 'name':track.name,
-                'author':track.author.username,
+                'author':track.author,
                 'tags':track.tags,
                 'length':track.length,
                 'album':track.album
@@ -70,7 +65,7 @@ def AllTracksData(request):
         file_url = fs.url(file_name)
         
         relation = TrackToUser()
-        relation.user = author
+        relation.username = author
         relation.track = track
         relation.save()
         return Success.SimpleSuccess(user_payload=payload)
@@ -80,26 +75,20 @@ def AllTracksData(request):
 
 
 def TrackData(request, track_id):
-    payload = tokendata.from_cookie_token_data(request)
-    if payload is None:
+    payload = authorize(request)
+    if not payload:
         return Error.TokenVerificationError()
-    
+
     try:
         track = Track.objects.get(id=track_id)
     except:
         return Error.TrackNotExist(user_payload=payload)
-    
-    try:
-        user = User.objects.get(username=payload['username'])
-    except:
-        return Error.UserNotExist(user_payload=payload)
-
 
     # Get Track Data
     if request.method == 'GET':
         data = {
             'id':track.id,
-            'author':track.author.username,
+            'author':track.author,
             'name':track.name,
             'tags':track.tags,
             'length':track.length,
@@ -111,7 +100,7 @@ def TrackData(request, track_id):
 
     # Update Track Data
     if request.method == 'PUT':
-        if track.author.username != user.username:
+        if track.author != payload['username']:
             return Error.UserIsntAuthor(user_payload=payload)
         
         try:
@@ -129,7 +118,7 @@ def TrackData(request, track_id):
     
     # Delete Track Data and Track Audio-File
     if request.method == 'DELETE':
-        if track.author.username != user.username:
+        if track.author != payload['username']:
             return Error.UserIsntAuthor(user_payload=payload)
         
         track.delete()
@@ -146,20 +135,13 @@ def TrackData(request, track_id):
 
 
 def TrackFile(request, track_id):
-    payload = tokendata.from_cookie_token_data(request)
-    if payload is None:
+    payload = authorize(request)
+    if not payload:
         return Error.TokenVerificationError()
 
-    try:
-        track = Track.objects.get(id=track_id)
-    except:
+    if not Track.objects.filter(id=track_id).exists():
         return Error.TrackNotExist(user_payload=payload)
-    
-    try:
-        user = User.objects.get(username=payload['username'])
-    except:
-        return Error.UserNotExist(user_payload=payload)
-    
+
 
     # Get track's audio file
     if request.method == 'GET':

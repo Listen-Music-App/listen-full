@@ -1,37 +1,36 @@
 from django.db import models
-from django.contrib.auth.models import User
 
 
 
 class Album(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.CharField(max_length=150, null=False)
     name = models.CharField(max_length=60)
     description = models.CharField(max_length=200, blank=True, null=True)
 
     def __str__(self) -> str:
-        return f'{self.author.username} - {self.name}'
+        return f'{self.author} - {self.name}'
 
 
 
 class Playlist(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.CharField(max_length=150, null=False)
     name = models.CharField(max_length=60)
     description = models.CharField(max_length=200, blank=True, null=True)
 
     def __str__(self) -> str:
-        return self.name
+        return f'{self.author} - {self.name}'
 
 
 
 class Track(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.CharField(max_length=150, null=False)
     name = models.CharField(max_length=60)
     tags = models.CharField(max_length=200, blank=True, null=True)
     length = models.IntegerField(null=True)
     album = models.ForeignKey(Album, blank=True, null=True, on_delete=models.CASCADE, related_name='tracks')
 
     def __str__(self) -> str:
-        return f'{self.author.username} - {self.name}'
+        return f'{self.author} - {self.name}'
 
 
 
@@ -49,21 +48,21 @@ class TrackToPlaylist(models.Model):
 
 class TrackToUser(models.Model):
     track = models.ForeignKey(Track, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tracks')
+    username = models.CharField(max_length=150, null=False)
 
     def __str__(self) -> str:
-        return f'{self.user.username} -> {self.track.name} [ID:{self.track.id}]'
+        return f'{self.username} -> {self.track.name} [ID:{self.track.id}]'
     
     class Meta:
-        unique_together = ("track", "user")
+        unique_together = ("track", "username")
     
 
 class PlaylistToUser(models.Model):
     playlist = models.ForeignKey(Playlist, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='playlists')
+    username = models.CharField(max_length=150, null=False)
 
     def __str__(self) -> str:
-        return f'{self.user.username} -> {self.playlist.name} [ID:{self.playlist.id}]'
+        return f'{self.username} -> {self.playlist.name} [ID:{self.playlist.id}]'
 
     class Meta:
-        unique_together = ("playlist", "user")
+        unique_together = ("playlist", "username")
