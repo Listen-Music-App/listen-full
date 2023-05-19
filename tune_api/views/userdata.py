@@ -3,48 +3,15 @@ import json
 import os
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse
-from tune_api.auth import authorize, userexists
+from tune_api.auth import JWT_auth_required, user_exists_check
 from tune_api.models import Playlist, PlaylistToUser, Track, TrackToUser
 from tune_api.views.results import Error, Success
 
 
 
-# def UserData(request, username):
-#     payload = authorize(request)
-#     if not payload:
-#         return Error.TokenVerificationError()
-        
-
-#     if request.method == 'GET':
-#         data = {
-#             'username':None,
-#             'first_name':None,
-#             'last_name':None,
-#             'desc':None
-#         }
-#         try:
-#             profile = Profile.objects.get(username=username)
-#         except:
-#             return Success.DataSuccess(data, user_payload=payload)
-        
-#         data['username'] = profile.username
-#         data['first_name'] = profile.first_name
-#         data['last_name'] = profile.last_name
-#         data['desc'] = profile.desc
-        
-#         return Success.DataSuccess(data, user_payload=payload)
-
-#     return Error.WrongMethod(user_payload=payload)
-
-
-
-def UserImage(request, username):
-    payload = authorize(request)
-    if not payload:
-        return Error.TokenVerificationError()
-
-    if not userexists(username):
-        return Error.UserNotExist(user_payload=payload)
+@JWT_auth_required
+@user_exists_check
+def UserImage(request, username, payload=None):
 
     storage = 'images/users/'
 
@@ -93,14 +60,9 @@ def UserImage(request, username):
 
 
 
-def UserTracksData(request, username):
-    payload = authorize(request)
-    if not payload:
-        return Error.TokenVerificationError()
-    
-    if not userexists(username):
-        return Error.UserNotExist(user_payload=payload)
-
+@JWT_auth_required
+@user_exists_check
+def UserTracksData(request, username, payload=None):
     # Get user's tracks
     if request.method == 'GET':
         offset = request.GET.get('offset', None)
@@ -182,15 +144,9 @@ def UserTracksData(request, username):
 
 
 
-def UserPlaylistsData(request, username):
-    payload = authorize(request)
-    if not payload:
-        return Error.TokenVerificationError()
-    
-    if not userexists(username):
-        return Error.UserNotExist(user_payload=payload)
-    
-
+@JWT_auth_required
+@user_exists_check
+def UserPlaylistsData(request, username, payload=None):   
     # Get user's playlists
     if request.method == 'GET':
         offset = request.GET.get('offset', None)

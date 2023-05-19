@@ -2,21 +2,18 @@ import glob
 import os
 from django.http import HttpResponse
 from django.core.files.storage import FileSystemStorage
-from tune_api.auth import authorize
+from tune_api.auth import JWT_auth_required
 from tune_api.models import Playlist, PlaylistToUser, Track, TrackToPlaylist
 from tune_api.views.results import Error, Success
 import json
 
 
 
-def AllPlaylistsData(request):
-    payload = authorize(request)
-    if not payload:
-        return Error.TokenVerificationError()
-    
+@JWT_auth_required
+def AllPlaylistsData(request, payload=None):
+       
     author = payload['username']
     
-
     # Get all Playlists
     if request.method == 'GET':
         data = {'playlists':[]}
@@ -57,11 +54,8 @@ def AllPlaylistsData(request):
 
 
 
-def PlaylistData(request, playlist_id):
-    payload = authorize(request)
-    if not payload:
-        return Error.TokenVerificationError()
-
+@JWT_auth_required
+def PlaylistData(request, playlist_id, payload=None):
     
     try:
         playlist = Playlist.objects.get(id=playlist_id)
@@ -107,10 +101,8 @@ def PlaylistData(request, playlist_id):
 
 
 
-def PlaylistImage(request, playlist_id):
-    payload = authorize(request)
-    if not payload:
-        return Error.TokenVerificationError()
+@JWT_auth_required
+def PlaylistImage(request, playlist_id, payload=None):
     
     try:
         playlist = Playlist.objects.get(id=playlist_id)
@@ -167,10 +159,8 @@ def PlaylistImage(request, playlist_id):
 
 
 
-def TrackToPlaylistData(request, playlist_id):
-    payload = authorize(request)
-    if not payload:
-        return Error.TokenVerificationError()
+@JWT_auth_required
+def TrackToPlaylistData(request, playlist_id, payload=None):
     
     try:
         playlist = Playlist.objects.get(id=playlist_id)

@@ -1,7 +1,7 @@
 import glob
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse
-from tune_api.auth import authorize
+from tune_api.auth import JWT_auth_required
 from tune_api.models import Track, TrackToUser
 from tune_api.views.results import Error, Success
 import json
@@ -9,11 +9,8 @@ import os
 
 
 
-def AllTracksData(request):
-    payload = authorize(request)
-    if not payload:
-        return Error.TokenVerificationError()
-    
+@JWT_auth_required
+def AllTracksData(request, payload=None):    
     author = payload['username']
     
 
@@ -74,10 +71,8 @@ def AllTracksData(request):
 
 
 
-def TrackData(request, track_id):
-    payload = authorize(request)
-    if not payload:
-        return Error.TokenVerificationError()
+@JWT_auth_required
+def TrackData(request, track_id, payload=None):
 
     try:
         track = Track.objects.get(id=track_id)
@@ -134,10 +129,8 @@ def TrackData(request, track_id):
     
 
 
-def TrackFile(request, track_id):
-    payload = authorize(request)
-    if not payload:
-        return Error.TokenVerificationError()
+@JWT_auth_required
+def TrackFile(request, track_id, payload=None):
 
     if not Track.objects.filter(id=track_id).exists():
         return Error.TrackNotExist(user_payload=payload)
