@@ -122,3 +122,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MICROSERVICE_SECRET_CODES = {
+    'Tune-API':'e^ewy|7X^feBi2^PlQT+ZDy<.g&@,1',
+}

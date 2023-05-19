@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse
 from tune_auth import tokendata
 from tune_auth.tokenconfig import JWT_AUTH
+from server.settings import MICROSERVICE_SECRET_CODES
 import json
 
 
@@ -100,14 +101,23 @@ def AccessTokenUpdate(request):
         access_payload = tokendata.token_data(new_access_token, JWT_AUTH['ACCESS_SECRET'])
 
         response = JsonResponse({'result':'success', 'token_payload':access_payload}, safe=False)
-        response.set_cookie(key='tune-access', value=new_access_token, expires=access_expirations, httponly=True)
+        response.set_cookie(key='tune-access', value=new_access_token, expires=access_expirations, httponly=True, path='/api/')
         return response
     
     return HttpResponse(405, status=405)
 
 
+
 def IsExistsCheck(request, username):
     if request.method == 'GET':
+        try:
+            secret = request.COOKIES['SECRET_KEY']
+        except:
+            return HttpResponse(400, status=400)
+        
+        if secret not in MICROSERVICE_SECRET_CODES.values():
+            return HttpResponse(401, status=401)
+
         if User.objects.filter(username=username).exists():
             return HttpResponse(200, status=200)
         return HttpResponse(404, status=404)
