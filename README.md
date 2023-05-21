@@ -33,7 +33,7 @@ MICEROSERVICE_SECRET_CODES = {
 AUTH_SERVER = 'http://yourhost:5000/auth/'
 SECRET_KEY = 'yoursecretkey'
 ```
-* Start both servers at the specified addresses.
+* Start both servers at the addresses you specified.
 ```ShellSession
 /home/tune-api> python manage.py runserver 127.0.0.1:8000
 ```
