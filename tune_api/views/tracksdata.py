@@ -6,6 +6,7 @@ from tune_api.models import Track, TrackToUser
 from tune_api.views.results import Error, Success
 import json
 import os
+import mutagen
 
 
 
@@ -47,19 +48,16 @@ def AllTracksData(request, payload=None):
         try:
             request_data = json.loads(request.POST['Data'])
             track_name = request_data['name']
-            track_tags = request_data['tags']
-            track_length = request_data['length']
-            track_album = request_data['album']
+            # track_tags = request_data['tags']
+            # track_album = request_data['album']
         except:
             return Error.WrongBodyRepresentation(user_payload=payload)
 
         track = Track()
         track.author = author
         track.name = track_name
+        track.length = mutagen.File(file).info.length
         track.save()
-
-        file_name = fs.save(f'{track.id}.{file_format}', file)
-        file_url = fs.url(file_name)
         
         relation = TrackToUser()
         relation.username = author
