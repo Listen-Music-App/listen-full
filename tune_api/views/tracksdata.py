@@ -2,7 +2,7 @@ import glob
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse
 from tune_api.auth import JWT_auth_required
-from tune_api.models import Track, TrackToUser
+from tune_api.models import Tag, TagToTrack, Track, TrackToUser
 from tune_api.views.results import Error, Success
 import json
 import os
@@ -48,21 +48,38 @@ def AllTracksData(request, payload=None):
         try:
             request_data = json.loads(request.POST['Data'])
             track_name = request_data['name']
-            # track_tags = request_data['tags']
+            track_tag_string = request_data['tags'] # Should be single string like "<sometag> <sometag> <tag> <some>"
             # track_album = request_data['album']
         except:
             return Error.WrongBodyRepresentation(user_payload=payload)
+        
+        tags = track_tag_string.split(' ')
+        bulk = []
+        for tag in tags:
+            bulk.append(Tag(text=tag))
+        Tag.objects.bulk_create(bulk, ignore_conflicts=True)
 
         track = Track()
         track.author = author
         track.name = track_name
+
+        track.tags = track_tag_string
         track.length = mutagen.File(file).info.length
         track.save()
-        
+
+        tags = Tag.objects.filter(text__in=tags)
+        bulk = []
+        for tag in tags:
+            bulk.append(TagToTrack(tag=tag, track=track))
+        TagToTrack.objects.bulk_create(bulk, ignore_conflicts=True)
+
         relation = TrackToUser()
         relation.username = author
         relation.track = track
         relation.save()
+
+        fs.save(f'{track.id}.{file_format}', file)
+
         return Success.SimpleSuccess(user_payload=payload)
     
     return Error.WrongMethod(user_payload=payload)
@@ -85,7 +102,7 @@ def TrackData(request, track_id, payload=None):
             'name':track.name,
             'tags':track.tags,
             'length':track.length,
-            'album':track.album
+            # 'album':track.album
         }
 
         return Success.DataSuccess(data, user_payload=payload)
@@ -99,12 +116,25 @@ def TrackData(request, track_id, payload=None):
         try:
             new_data = json.loads(request.body)
             track.name = new_data["name"]
-            track.tags = new_data["tags"]
-            track.length = new_data["length"]
-            track.album = new_data["album"]
+            tags = new_data["tags"] # Should be single string like "<sometag> <sometag> <tag> <some>"
         except:
             return Error.WrongBodyRepresentation(user_payload=payload)
         
+        if track.tags != tags:
+            track.tags = tags
+
+            tags = tags.split(' ')
+            bulk = []
+            for tag in tags:
+                bulk.append(Tag(text=tag))
+            Tag.objects.bulk_create(bulk, ignore_conflicts=True)
+
+            tags = Tag.objects.filter(text__in=tags)
+            bulk = []
+            for tag in tags:
+                bulk.append(TagToTrack(tag=tag, track=track))
+            TagToTrack.objects.bulk_create(bulk, ignore_conflicts=True)
+
         track.save()
         return Success.SimpleSuccess(user_payload=payload)
     

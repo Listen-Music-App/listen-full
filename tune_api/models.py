@@ -57,6 +57,7 @@ class TrackToUser(models.Model):
         unique_together = ("track", "username")
     
 
+
 class PlaylistToUser(models.Model):
     playlist = models.ForeignKey(Playlist, on_delete=models.CASCADE)
     username = models.CharField(max_length=150, null=False)
@@ -66,3 +67,23 @@ class PlaylistToUser(models.Model):
 
     class Meta:
         unique_together = ("playlist", "username")
+
+
+
+class Tag(models.Model):
+    text = models.TextField(null=False, unique=True)
+
+    def __str__(self) -> str:
+        return f'#{self.text}'
+
+
+
+class TagToTrack(models.Model):
+    tag = models.ForeignKey(Tag, null=False, on_delete=models.DO_NOTHING)
+    track = models.ForeignKey(Track, null=False, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return f'track_id: {self.track.id}, hashtag_id: {self.tag.id}'
+    
+    class Meta:
+        unique_together = ("tag", "track")
