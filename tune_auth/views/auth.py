@@ -82,7 +82,7 @@ def AccessTokenVerification(request):
 def AccessTokenUpdate(request):
     if request.method == 'GET':
         try:
-            refresh_token = request.COOKIES['tune-refresh']
+            refresh_token = request.headers['RefreshToken']
         except:
             return HttpResponse(status=400)
         
@@ -111,7 +111,7 @@ def AccessTokenUpdate(request):
 def IsExistsCheck(request, username):
     if request.method == 'GET':
         try:
-            secret = request.COOKIES['SECRET_KEY']
+            secret = request.headers['SECRET_KEY']
         except:
             return HttpResponse(400, status=400)
         
