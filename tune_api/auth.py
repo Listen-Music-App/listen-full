@@ -6,10 +6,12 @@ AUTH_SERVER = 'http://127.0.0.1:5000/auth/'
 API_SECRET_KEY = 'e^ewy|7X^feBi2^PlQT+ZDy<.g&@,1'
 
 def authorize(request):
-    '''Checks request cookies for access token and
+    '''Checks request "Authorization" header for access token and
     sends request to the AUTH microservice and return payload if response == 200'''
     try:
-        token = request.COOKIES['tune-access']
+        token = request.headers['Authorization']
+        if token.split(' ')[0] == 'Bearer':
+            token = token.split(' ')[1]
     except:
         return None
     
