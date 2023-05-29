@@ -27,10 +27,11 @@ def authorize(request):
 def userexists(username):
     '''Sends request to the AUTH microservice
     and return bool value'''
-    response = requests.get(f'{AUTH_SERVER}check/{username}', cookies={'SECRET_KEY':API_SECRET_KEY})
+    response = requests.get(f'{AUTH_SERVER}check/{username}/', headers={'Secret-Key':API_SECRET_KEY})
     if response.status_code != 200:
         return False
     return True
+
 
 
 def JWT_auth_required(endpoint):
