@@ -111,7 +111,7 @@ def AccessTokenUpdate(request):
 def IsExistsCheck(request, username):
     if request.method == 'GET':
         try:
-            secret = request.headers['SECRET_KEY']
+            secret = request.headers['Secret-Key']
         except:
             return HttpResponse(400, status=400)
         
