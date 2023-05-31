@@ -24,16 +24,21 @@ def AllTracksData(request, payload=None):
         if search:
             filter_map['name__icontains'] = search
 
+        genre = request.GET.get('genre', None)
+        if genre:
+            filter_map['genre_id'] = genre
+
         data = {'tracks':[]}
 
-        tracks_query = Track.objects.filter(**filter_map)[offset:limit]
+        tracks_query = Track.objects.filter(**filter_map)[offset:offset + limit]
         for track in tracks_query:
             data['tracks'].append({
                 'id':track.id,
                 'name':track.name,
                 'author':track.author,
                 'length':track.length,
-                'album':track.album
+                'album':track.album, 
+                'genre':track.genre.name,
             })
         return Success.DataSuccess(data, user_payload=payload)
 
@@ -55,6 +60,7 @@ def AllTracksData(request, payload=None):
         try:
             request_data = json.loads(request.POST['Data'])
             track_name = request_data['name']
+            track_genre = request_data['genre']
             # track_album = request_data['album']
         except:
             return Error.WrongBodyRepresentation(user_payload=payload)
@@ -62,6 +68,7 @@ def AllTracksData(request, payload=None):
         track = Track()
         track.author = author
         track.name = track_name
+        track.genre = track_genre
 
         track.length = mutagen.File(file).info.length
         track.save()
@@ -94,6 +101,7 @@ def TrackData(request, track_id, payload=None):
             'author':track.author,
             'name':track.name,
             'length':track.length,
+            'genre':track.genre,
             # 'album':track.album
         }
 
@@ -108,6 +116,7 @@ def TrackData(request, track_id, payload=None):
         try:
             new_data = json.loads(request.body)
             track.name = new_data["name"]
+            track.genre = new_data["genre"]
         except:
             return Error.WrongBodyRepresentation(user_payload=payload)
 

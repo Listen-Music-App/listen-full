@@ -22,10 +22,19 @@ class Playlist(models.Model):
 
 
 
+class Genre(models.Model):
+    name = models.CharField(max_length=50, null=False)
+
+    def __str__(self) -> str:
+        return self.name
+
+
+
 class Track(models.Model):
     author = models.CharField(max_length=150, null=False)
     name = models.CharField(max_length=60)
     length = models.IntegerField(null=True)
+    genre = models.ForeignKey(Genre, blank=True, null=True, on_delete=models.DO_NOTHING, related_name='tracks')
     album = models.ForeignKey(Album, blank=True, null=True, on_delete=models.CASCADE, related_name='tracks')
 
     def __str__(self) -> str:

@@ -1,5 +1,5 @@
 from django.urls import path
-from tune_api.views import userdata, playlistsdata, tracksdata
+from tune_api.views import genresdata, userdata, playlistsdata, tracksdata
 
 urlpatterns = [
     path('user/<str:username>/tracks/', userdata.UserTracksData, name='UserTracksData'),
@@ -8,6 +8,8 @@ urlpatterns = [
     path('playlists/', playlistsdata.AllPlaylistsData, name='AllPlaylistsData'),
     path('playlists/<int:playlist_id>/', playlistsdata.PlaylistData, name='PlaylistData'),
     path('playlists/<int:playlist_id>/tracks/', playlistsdata.TrackToPlaylistData, name='TracksToPlaylist'),
+
+    path('genres/', genresdata.AllGenresData, name='AllGenresData'),
 
     path('tracks/', tracksdata.AllTracksData, name='AllTracksData'),
     path('tracks/<int:track_id>/', tracksdata.TrackData, name='TrackData'),
