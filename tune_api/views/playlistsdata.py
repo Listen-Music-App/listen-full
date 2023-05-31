@@ -206,7 +206,6 @@ def TrackToPlaylistData(request, playlist_id, payload=None):
                 'id':track.id,
                 'name':track.name,
                 'author':track.author,
-                'tags':track.tags,
                 'length':track.length,
                 'album':track.album
             })
