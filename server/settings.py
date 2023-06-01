@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -124,5 +125,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MICROSERVICE_SECRET_CODES = {
-    'Tune-API':'e^ewy|7X^feBi2^PlQT+ZDy<.g&@,1',
+    'listen-api': os.environ.get('API_SECRET_CODE', 'e^ewy|7X^feBi2^PlQT+ZDy<.g&@,1'),
 }
