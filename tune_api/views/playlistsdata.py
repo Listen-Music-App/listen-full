@@ -16,8 +16,12 @@ def AllPlaylistsData(request, payload=None):
     
     # Get all Playlists
     if request.method == 'GET':
+        offset = int(request.GET.get('offset', 0))
+        limit = int(request.GET.get('limit', 10))
+
         data = {'playlists':[]}
-        playlists_query = Playlist.objects.all()
+        playlists_query = Playlist.objects.all()[offset:offset+limit]
+        
         for playlist in playlists_query:
             data['playlists'].append({
                 'id':playlist.id,

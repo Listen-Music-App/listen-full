@@ -1,8 +1,9 @@
+import os
 import requests
 
 from tune_api.views.results import Error
 
-AUTH_SERVER = 'http://127.0.0.1:5000/auth/'
+AUTH_SERVER = os.environ.get('AUTH_SERVER', 'http://localhost:3000/auth/')
 API_SECRET_KEY = 'e^ewy|7X^feBi2^PlQT+ZDy<.g&@,1'
 
 def authorize(request):
