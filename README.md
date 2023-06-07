@@ -1,25 +1,37 @@
-# tune-auth
-## AUTH microservice for Tune-Music-App.
-### How to get AccessToken and RefreshToken?
+# AUTH microservice for Listen-Music-App.
+## How to get AccessToken and RefreshToken?
 * Use /auth/register/ to register your self on server.
 * Use /auth/login/ to login and get Access and Refresh tokens.
-### What this microservice do?
+## What this microservice do?
 * This server can identify, authenticate and authorize users.
 * This server can let another microservice know if a user with the given nickname exists.<br>
 <sub>Read the documentation for more information.</sub>
-### Where can i read documentation?
-* Check out documentation on https://documenter.getpostman.com/view/27286123/2s93m1bQp7
-### How can i run it?
-* Clone this repo and customize */tune-auth/server/settings.py*. Add microservice_secret_codes in it.<br>
-<sub>This is needed to authorize other microservices</sub>
-```python
-MICEROSERVICE_SECRET_CODES = {
-  'microservicename':'yoursecretcode',
-}
+
+## Where can i read an API documentation?
+* Check out documentation on https://documenter.getpostman.com/view/27286123/2s93m1bQp7 [old version]
+
+## How can i run it?
+* Clone this repo and customize *dockerfile*. Change API_SECRET_CODE (if you want). You may also change host and port, but this is not recomended if you want to just test it on your own PC.<br>
+
+```dockerfile
+ENV HOST=0.0.0.0 PORT=3000 API_SECRETE_CODE=some-secret-code
+
+EXPOSE 3000
 ```
-* Start server.
-```ShellSession
-/home/tune-auth> python manage.py runserver 127.0.0.1:5000
+
+* Build a docker image.
+
+```shell
+docker build -t listen-auth:latest . 
 ```
-### Where can i try it as a client?
+
+* Run docker container
+```shell
+docker run -p 127.0.0.1:3000:3000/tcp -d --name listen-auth listen-auth:latest
+```
+
+## Where can i try it as a client?
 * We didn't deploy yet.
+* We have no frontend D:
+
+### IF YOU WANT TO CREATE A FRONT-END FOR IT, TEXT ME ON *lengthylyova@gmail.com*

@@ -125,5 +125,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MICROSERVICE_SECRET_CODES = {
-    'listen-api': os.environ.get('API_SECRET_CODE', 'e^ewy|7X^feBi2^PlQT+ZDy<.g&@,1'),
+    'listen-api': os.environ.get('API_SECRET_CODE', 'some-secret-code'),
 }
