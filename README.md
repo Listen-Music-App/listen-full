@@ -11,24 +11,7 @@
 * Check out documentation on https://documenter.getpostman.com/view/27286123/2s93m1bQp7 [old version]
 
 ## How can i run it?
-* Clone this repo and customize *dockerfile*. Change API_SECRET_CODE (if you want). You may also change host and port, but this is not recomended if you want to just test it on your own PC.<br>
-
-```dockerfile
-ENV HOST=0.0.0.0 PORT=3000 API_SECRETE_CODE=some-secret-code
-
-EXPOSE 3000
-```
-
-* Build a docker image.
-
-```shell
-docker build -t listen-auth:latest . 
-```
-
-* Run docker container
-```shell
-docker run -p 127.0.0.1:3000:3000/tcp -d --name listen-auth listen-auth:latest
-```
+* Check main README.md on the organization page.
 
 ## Where can i try it as a client?
 * We didn't deploy yet.
