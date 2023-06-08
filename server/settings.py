@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 from datetime import timedelta
 
@@ -37,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'tune_api',
+    'listen_api',
 ]
 
 MIDDLEWARE = [
@@ -77,11 +78,11 @@ WSGI_APPLICATION = 'server.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'tunedb',
-        'USER':'owner',
-        'PASSWORD':'password',
-        'HOST':'192.168.1.6',
-        'PORT': '5432',
+        'NAME': os.environ.get('DB_NAME', "listendb"),
+        'USER': os.environ.get('DB_USER', "owner"),
+        'PASSWORD':os.environ.get('DB_PASSWORD', "password"),
+        'HOST':os.environ.get('DB_HOST', "127.0.0.1"),
+        'PORT': os.environ.get('DB_PORT', "5432"),
     }
 }
 

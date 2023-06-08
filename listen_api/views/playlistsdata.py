@@ -2,9 +2,9 @@ import glob
 import os
 from django.http import HttpResponse
 from django.core.files.storage import FileSystemStorage
-from tune_api.auth import JWT_auth_required
-from tune_api.models import Playlist, PlaylistToUser, Track, TrackToPlaylist
-from tune_api.views.results import Error, Success
+from listen_api.auth import JWT_auth_required
+from listen_api.models import Playlist, PlaylistToUser, Track, TrackToPlaylist
+from listen_api.views.results import Error, Success
 import json
 
 

@@ -1,10 +1,10 @@
 import os
 import requests
 
-from tune_api.views.results import Error
+from listen_api.views.results import Error
 
-AUTH_SERVER = os.environ.get('AUTH_SERVER', 'http://localhost:3000/auth/')
-API_SECRET_KEY = 'e^ewy|7X^feBi2^PlQT+ZDy<.g&@,1'
+AUTH_SERVER = os.environ.get('AUTH_SERVER', 'http://127.0.0.1:3000/auth/')
+API_SECRET_KEY = os.environ.get('API_SECRET_KEY', 'some-secret-key')
 
 def authorize(request):
     '''Checks request "Authorization" header for access token and

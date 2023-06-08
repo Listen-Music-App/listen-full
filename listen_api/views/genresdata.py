@@ -1,6 +1,6 @@
-from tune_api.models import Genre
-from tune_api.views.results import Error, Success
-from tune_api.auth import JWT_auth_required
+from listen_api.models import Genre
+from listen_api.views.results import Error, Success
+from listen_api.auth import JWT_auth_required
 
 
 

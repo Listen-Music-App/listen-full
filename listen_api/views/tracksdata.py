@@ -1,9 +1,9 @@
 import glob
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse
-from tune_api.auth import JWT_auth_required
-from tune_api.models import Track, TrackToUser
-from tune_api.views.results import Error, Success
+from listen_api.auth import JWT_auth_required
+from listen_api.models import Track, TrackToUser
+from listen_api.views.results import Error, Success
 import json
 import os
 import mutagen

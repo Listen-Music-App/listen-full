@@ -3,9 +3,9 @@ import json
 import os
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse
-from tune_api.auth import JWT_auth_required, user_exists_check
-from tune_api.models import Playlist, PlaylistToUser, Track, TrackToUser
-from tune_api.views.results import Error, Success
+from listen_api.auth import JWT_auth_required, user_exists_check
+from listen_api.models import Playlist, PlaylistToUser, Track, TrackToUser
+from listen_api.views.results import Error, Success
 
 
 
