@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse
-from tune_auth import tokendata
-from tune_auth.tokenconfig import JWT_AUTH
+from listen_auth import tokendata
+from listen_auth.tokenconfig import JWT_AUTH
 from server.settings import MICROSERVICE_SECRET_CODES
 import json
 

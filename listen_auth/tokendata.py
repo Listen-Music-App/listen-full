@@ -2,7 +2,7 @@ from datetime import datetime, timezone, timedelta
 import jwt
 from rest_framework_jwt.utils import jwt_payload_handler
 
-from tune_auth.tokenconfig import JWT_AUTH
+from listen_auth.tokenconfig import JWT_AUTH
 
 
 

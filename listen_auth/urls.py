@@ -1,5 +1,5 @@
 from django.urls import path
-from tune_auth.views import auth
+from listen_auth.views import auth
 
 urlpatterns = [
     path('register/', auth.UserRegister, name='UserRegister'),
