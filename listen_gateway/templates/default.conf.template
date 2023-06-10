@@ -1,0 +1,13 @@
+server {
+    listen 80;
+
+    # redirecting to the listen-AUTH microservice
+    location /auth/ {
+        proxy_pass http://$HOST:${AUTH_PORT}/auth/;
+    }
+
+    # redirecting to the listen-API microservice
+    location /api/ {
+        proxy_pass http://$HOST:${API_PORT}/api/;
+    }
+}

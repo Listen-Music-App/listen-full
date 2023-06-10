@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-h2ks^!ij@(=5$6fa&7*z_w4ye_u3txd$8d^p5k^%9xw_&k%ba*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['listen_api', '*']
 
 
 # Application definition

@@ -1,6 +1,6 @@
 FROM python:latest
 
-COPY . /app
+COPY /listen_auth /app
 
 RUN pip install -r app/requirements.txt
 
