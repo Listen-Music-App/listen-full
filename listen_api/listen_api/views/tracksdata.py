@@ -2,7 +2,7 @@ import glob
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse
 from listen_api.auth import JWT_auth_required
-from listen_api.models import Track, TrackToUser
+from listen_api.models import Genre, Track, TrackToUser
 from listen_api.views.results import Error, Success
 import json
 import os
@@ -64,12 +64,16 @@ def AllTracksData(request, payload=None):
             # track_album = request_data['album']
         except:
             return Error.WrongBodyRepresentation(user_payload=payload)
+        
+        track_genre = Genre.objects.filter(name=track_genre).first()
+
+        if track_genre is None:
+            return Error.GenreNotExist(user_payload=payload)
 
         track = Track()
         track.author = author
         track.name = track_name
         track.genre = track_genre
-
         track.length = mutagen.File(file).info.length
         track.save()
 
@@ -116,10 +120,15 @@ def TrackData(request, track_id, payload=None):
         try:
             new_data = json.loads(request.body)
             track.name = new_data["name"]
-            track.genre = new_data["genre"]
+            genre = new_data["genre"]
         except:
             return Error.WrongBodyRepresentation(user_payload=payload)
 
+        genre = Genre.objects.filter(name=genre).first()
+        if genre is None:
+            return Error.GenreNotExist(user_payload=payload)
+
+        track.genre = genre
         track.save()
         return Success.SimpleSuccess(user_payload=payload)
     

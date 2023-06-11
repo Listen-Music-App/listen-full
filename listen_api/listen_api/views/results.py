@@ -38,6 +38,10 @@ class Error:
         return JsonResponse({'result':'failed','error':'TrackNotExist', 'user_payload':user_payload}, safe=False, status=404)
 
     @staticmethod
+    def GenreNotExist(user_payload=None):
+        return JsonResponse({'result':'failed','error':'GenreNotExist', 'user_payload':user_payload}, safe=False, status=404)
+
+    @staticmethod
     def RelationNotExist(user_payload=None):
         return JsonResponse({'result':'failed','error':'RelationNotExist', 'user_payload':user_payload}, safe=False, status=404)
     
