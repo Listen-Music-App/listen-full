@@ -1,5 +1,5 @@
 services:
-  listen_auth:
+  auth:
     build:
       context: .
       dockerfile: listen_auth/dockerfile
@@ -16,7 +16,7 @@ services:
     ports:
       - "3000:3000"
     
-  listen_api:
+  api:
     build:
       context: .
       dockerfile: listen_api/dockerfile
@@ -24,12 +24,12 @@ services:
     environment:
       - HOST=0.0.0.0
       - PORT=5000
-      - DB_HOST=listendb
+      - DB_HOST=db
       - DB_PORT=5432
       - DB_NAME=listendb
       - DB_USER=owner
       - DB_PASSWORD=password
-      - AUTH_SERVER=listen_auth:3000
+      - AUTH_SERVER=http://auth:3000/auth/
       - API_SECRETE_KEY=some-secret-key
     
     env_file:
@@ -40,12 +40,12 @@ services:
       - "5000:5000"
 
     depends_on:
-      - listendb
-      - listen_auth
+      - db
+      - auth
     
     restart: always
     
-  listendb:
+  db:
     image: postgres:latest
     environment:
       - POSTGRES_USER=owner
@@ -59,21 +59,21 @@ services:
       context: .
       dockerfile: listen_gateway/dockerfile
     environment:
-      - AUTH_HOST=listen_auth
+      - AUTH_HOST=auth
       - AUTH_PORT=3000
-      - API_HOST=listen_api
+      - API_HOST=api
       - API_PORT=5000
     
     env_file:
       - host.env
 
     links:
-      - listen_auth
-      - listen_api
+      - auth
+      - api
 
     ports:
       - "80:80"
 
     depends_on:
-      - listen_auth
-      - listen_api
+      - auth
+      - api
