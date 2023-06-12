@@ -2,6 +2,8 @@ from django.urls import path
 from listen_api.views import genresdata, userdata, playlistsdata, tracksdata
 
 urlpatterns = [
+    path('user/create/', userdata.UserProfileCreate, name='UserProfileCreate [by server only]'),
+    path('user/<str:username>/', userdata.UserPublicData, name='UserPublicData'),
     path('user/<str:username>/tracks/', userdata.UserTracksData, name='UserTracksData'),
     path('user/<str:username>/playlists/', userdata.UserPlaylistsData, name='UserPlaylistsData'),
 

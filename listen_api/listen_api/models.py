@@ -2,13 +2,16 @@ from django.db import models
 
 
 
-class Album(models.Model):
-    author = models.CharField(max_length=150, null=False)
-    name = models.CharField(max_length=60)
-    description = models.CharField(max_length=200, blank=True, null=True)
+class Profile(models.Model):
+    username = models.CharField(max_length=150, null=False)
+    first_name = models.CharField(max_length=60, blank=True, null=True)
+    last_name = models.CharField(max_length=60, blank=True, null=True)
+    country = models.CharField(max_length=2, blank=True, null=True)
+    age = models.IntegerField(blank=True, null=True)
+    desc = models.TextField(max_length=300, blank=True, null=True)
 
     def __str__(self) -> str:
-        return f'{self.author} - {self.name}'
+        return f"{self.username}'s profile"
 
 
 
@@ -35,7 +38,6 @@ class Track(models.Model):
     name = models.CharField(max_length=60)
     length = models.IntegerField(null=True)
     genre = models.ForeignKey(Genre, blank=True, null=True, on_delete=models.DO_NOTHING, related_name='tracks')
-    album = models.ForeignKey(Album, blank=True, null=True, on_delete=models.CASCADE, related_name='tracks')
 
     def __str__(self) -> str:
         return f'{self.author} - {self.name}'

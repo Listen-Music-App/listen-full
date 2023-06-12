@@ -37,7 +37,7 @@ def AllTracksData(request, payload=None):
                 'name':track.name,
                 'author':track.author,
                 'length':track.length,
-                'album':track.album, 
+                # 'album':track.album, 
                 'genre':track.genre.name,
             })
         return Success.DataSuccess(data, user_payload=payload)

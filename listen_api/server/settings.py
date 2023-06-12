@@ -132,3 +132,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MICROSERVICE_SECRET_CODES = {
+    'listen-auth': os.environ.get('AUTH_SECRET_KEY', 'some-secret-key'),
+}

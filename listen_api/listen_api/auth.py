@@ -3,7 +3,7 @@ import requests
 
 from listen_api.views.results import Error
 
-AUTH_SERVER = os.environ.get('AUTH_SERVER', 'http://127.0.0.1:3000/auth/')
+AUTH_SERVER = 'http://' + os.environ.get('HOST', '127.0.0.1') + ':3000/auth/'
 API_SECRET_KEY = os.environ.get('API_SECRET_KEY', 'some-secret-key')
 
 def authorize(request):

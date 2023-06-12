@@ -131,6 +131,9 @@ celerybeat.pid
 *.png
 *.gif
 
+!userdefaultimage.jpg
+!playlistdefaultimage.jpg
+
 # Environments
 .env
 .venv

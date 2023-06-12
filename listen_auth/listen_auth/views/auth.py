@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse
 from listen_auth import tokendata
+from listen_auth.api import create_new_profile
 from listen_auth.tokenconfig import JWT_AUTH
 from server.settings import MICROSERVICE_SECRET_CODES
 import json
@@ -17,7 +18,10 @@ def UserRegister(request):
 
         if User.objects.filter(email=data['email']):
             return HttpResponse(409, status=409)
-             
+        
+        if not create_new_profile(data['username']):
+            return HttpResponse(500, status=500)
+
         user = User()
         user.username = data['username']
         user.email = data['email']

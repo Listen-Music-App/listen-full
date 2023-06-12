@@ -1,3 +1,4 @@
+import base64
 import glob
 import os
 from django.http import HttpResponse
@@ -125,13 +126,14 @@ def PlaylistImage(request, playlist_id, payload=None):
             f = open(filename, "rb")
             format = filename.split('.')[-1]
         else:
-            f = open(f"images/playlists/playlistdefaultimage.png", "rb")
-            format = 'png'
+            path = os.path.dirname(os.path.realpath(__file__)).replace('listen_api/views', 'images/playlists/playlistdefaultimage.jpg')
+            f = open(path, "rb")
+            format = 'jpg'
 
         response = HttpResponse()
         response['Content-Type'] = f'image/{format}'
 
-        response.write(f.read())
+        response.write(base64.b64encode(f.read()))
         return response
     
 
@@ -211,7 +213,7 @@ def TrackToPlaylistData(request, playlist_id, payload=None):
                 'name':track.name,
                 'author':track.author,
                 'length':track.length,
-                'album':track.album
+                # 'album':track.album
             })
         return Success.DataSuccess(data, user_payload=payload)
     
