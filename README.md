@@ -20,5 +20,5 @@ HOST="192.168.1.2"
 ```shell
 D:\some\path\listen_full> docker compose -up --build
 ```
-* Interact with the service using our api **[JWT authorization required]**.
+* Interact with the service using our api **https://documenter.getpostman.com/view/27286123/2s93m1bQam**
 <img src="https://i.imgur.com/3IBTIWw.png">
