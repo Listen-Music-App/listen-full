@@ -54,8 +54,8 @@ def UserLogin(request):
         refresh_token, refresh_expiration = tokendata.refresh_token_generate(user)
         
         response = JsonResponse({'result':'success', 'user_payload':access_payload}, safe=False, status=200)
-        response.set_cookie(key='tune-access', value=access_token, expires=access_expiration, httponly=True, path='/api/')
-        response.set_cookie(key='tune-refresh', value=refresh_token, expires=refresh_expiration, httponly=True, path='/auth/update')
+        response.set_cookie(key='listen-access', value=access_token, expires=access_expiration, httponly=True, path='/')
+        response.set_cookie(key='listen-refresh', value=refresh_token, expires=refresh_expiration, httponly=True, path='/auth/update')
         return response
 
     return HttpResponse(405, status=405)
@@ -105,7 +105,7 @@ def AccessTokenUpdate(request):
         access_payload = tokendata.token_data(new_access_token, JWT_AUTH['ACCESS_SECRET'])
 
         response = JsonResponse({'result':'success', 'token_payload':access_payload}, safe=False)
-        response.set_cookie(key='tune-access', value=new_access_token, expires=access_expirations, httponly=True, path='/api/')
+        response.set_cookie(key='listen-access', value=new_access_token, expires=access_expirations, httponly=True, path='/')
         return response
     
     return HttpResponse(405, status=405)
