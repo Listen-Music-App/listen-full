@@ -19,3 +19,4 @@ sqlparse==0.4.4
 tzdata==2023.3
 urllib3==2.0.2
 yarg==0.1.9
+django-cors-headers==4.1.0

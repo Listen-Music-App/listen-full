@@ -1,6 +1,5 @@
 server {
     listen 80;
-    add_header 'Access-Contrtol-Allow-Origin' '*' always;
 
     # redirecting to the listen-AUTH microservice
     location /auth/ {

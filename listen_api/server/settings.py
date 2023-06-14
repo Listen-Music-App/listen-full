@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ['listen_api', '*']
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -136,3 +138,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MICROSERVICE_SECRET_CODES = {
     'listen-auth': os.environ.get('AUTH_SECRET_KEY', 'some-secret-key'),
 }
+
+CORS_ORIGIN_ALLOW_ALL=True
