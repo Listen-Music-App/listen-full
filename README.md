@@ -12,10 +12,6 @@
 git clone https://github.com/Listen-Music-App/listen-full.git
 ```
 * Run docker engine.
-* Open the cloned directory and change the host in the *host.env* file. Instead of **0.0.0.0**, insert your **ipv4**.
-```shell
-HOST="192.168.1.2"
-```
 * Run docker compose. Make sure you are in the right directory.
 ```shell
 D:\some\path\listen_full> docker compose -up --build
