@@ -1,7 +1,7 @@
 import os
 import requests
 
-API_SERVER = 'http://' + os.environ.get('HOST', '127.0.0.1') + ':5000/api/'
+API_SERVER = 'http://' + os.environ.get('api', 'api') + ':5000/api/'
 AUTH_SECRET_KEY = os.environ.get('AUTH_SECRET_KEY', 'some-secret-key')
 
 

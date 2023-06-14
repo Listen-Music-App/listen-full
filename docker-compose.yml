@@ -11,7 +11,7 @@ services:
       - AUTH_SECRET_KEY=some-secret-key
 
     env_file:
-      - host.env
+      - env.env
 
     command: bash -c " python app/manage.py migrate && python app/manage.py runserver "
     ports:
@@ -35,7 +35,7 @@ services:
       - AUTH_SERVER=http://auth:3000/auth/
     
     env_file:
-      - host.env
+      - env.env
 
     command: bash -c " python app/manage.py makemigrations listen_api && python app/manage.py migrate && python app/manage.py runserver "
     ports:
@@ -63,13 +63,11 @@ services:
     environment:
       - AUTH_PORT=3000
       - API_PORT=5000
+      - auth=auth
+      - api=api
     
     env_file:
-      - host.env
-
-    links:
-      - auth
-      - api
+      - env.env
 
     ports:
       - "80:80"

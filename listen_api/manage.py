@@ -7,7 +7,7 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    runserver.default_addr = os.environ.get('RUNSERVER_HOST', '127.0.0.1')
+    runserver.default_addr = os.environ.get('RUNSERVER_HOST', 'localhost')
     runserver.default_port = os.environ.get('PORT', '5000')
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'server.settings')
