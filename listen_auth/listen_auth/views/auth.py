@@ -1,4 +1,6 @@
 from django.contrib.auth.models import User
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 from django.http import HttpResponse, JsonResponse
 from listen_auth import tokendata
 from listen_auth.api import create_new_profile
@@ -24,6 +26,11 @@ def UserRegister(request):
 
         user = User()
         user.username = data['username']
+        try:
+            validate_email(data['email'])
+        except ValidationError:
+            return HttpResponse(422, status=422)
+        
         user.email = data['email']
         user.set_password(data['password'])
         user.save()
