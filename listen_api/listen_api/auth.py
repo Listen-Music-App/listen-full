@@ -10,10 +10,7 @@ def authorize(request):
     '''Checks request "Authorization" header for access token and
     sends request to the AUTH microservice and return payload if response == 200'''
     try:
-        token = request.headers['Authorization']
-        if token.split(' ')[0] != 'Bearer':
-            return None
-        token = token.split(' ')[1]
+        token = request.COOKIES.get('listen-access')
     except:
         return None
     
